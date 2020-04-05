@@ -5,24 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorToolbar"
+    android:minHeight="0dp"
     android:orientation="vertical"
     android:paddingLeft="5dp"
     android:paddingTop="6dp"
     android:paddingRight="5dp"
-    android:paddingBottom="5dp">
+    android:paddingBottom="5dp"
+    app:contentInsetStart="10sp"
+    app:contentInsetStartWithNavigation="60sp"
+    app:maxButtonHeight="55dp"
+    app:navigationIcon="@drawable/ic_ganeral">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <ImageButton
-            android:id="@+id/btnNav"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/ic_ganeral"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/btGiohang"
@@ -38,14 +34,12 @@
             android:id="@+id/searchView"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:background="@drawable/shape_search"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btGiohang"
-            app:layout_constraintStart_toEndOf="@+id/btnNav"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView

@@ -13,16 +13,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:visibility="visible"
-                app:navigationIcon="@drawable/ic_back"
-                app:titleTextColor="#fff"
-                app:title="Thông tin cá nhân"></androidx.appcompat.widget.Toolbar>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:paddingRight="5dp"
+            android:visibility="visible"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="Thông tin cá nhân"
+            app:titleTextColor="#fff"></androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#00464141"
@@ -40,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:background="@drawable/img_flower"
-                android:minHeight="150dp"
+                android:minHeight="140dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -264,41 +269,43 @@
                         android:textSize="15sp" />
                 </TableRow>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="5dp"
-                        android:text="Địa chỉ"
-                        android:textColor="#000000"
-                        android:textSize="16sp" />
-
-                    <EditText
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_weight="1"
-                        android:background="@android:color/transparent"
-                        android:ems="10"
-                        android:gravity="right"
-                        android:inputType="textPersonName"
-                        android:lines="2"
-                        android:padding="5dp"
-                        android:text="328/6/1 Hoàng Hoa Thám, Ba Đình, Hà Nội"
-                        android:textSize="15sp" />
-                </TableRow>
-
 
             </TableLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:padding="8dp"
+        app:layout_anchor="@+id/nestedScrollView2"
+        app:layout_anchorGravity="bottom|center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:text="Địa chỉ"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:gravity="right"
+            android:inputType="textPersonName"
+            android:lines="10"
+            android:padding="5dp"
+            android:text="328/6/1 Hoàng Hoa Thám, Ba Đình, Hà Nội"
+            android:textSize="15sp" />
+    </TableRow>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

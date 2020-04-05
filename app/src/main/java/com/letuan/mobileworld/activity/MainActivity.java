@@ -113,8 +113,7 @@ public class MainActivity extends AppCompatActivity {
             CustomIntent.customType(this, com.letuan.mobileworld.activity.Animation.LEFT_TO_RIGHT);
         });
 
-        final ImageButton btnNav = findViewById(R.id.btnNav);
-        btnNav.setOnClickListener(e->{
+        toolbar.setNavigationOnClickListener(e->{
 
         });
 
