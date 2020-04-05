@@ -9,9 +9,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -30,7 +28,6 @@ import java.util.List;
 
 import maes.tech.intentanim.CustomIntent;
 
-import static com.letuan.mobileworld.R.layout.toast_view;
 import static java.lang.String.valueOf;
 
 public class ProductDetail extends AppCompatActivity {
@@ -64,7 +61,7 @@ public class ProductDetail extends AppCompatActivity {
         txtNameDetail = findViewById(R.id.txtnamedetail);
         txtPriceDetail = findViewById(R.id.txtpricedetail);
         txtDescription = findViewById(R.id.txtdescriptiondetail);
-        spinner = findViewById(R.id.spinner);
+        spinner = findViewById(R.id.spSluong);
         btnOrder = findViewById(R.id.btnorder);
         btnBuy = findViewById(R.id.btnbuy);
 
