@@ -39,7 +39,7 @@ public class ProductDetail extends AppCompatActivity {
     Toolbar toolbarDetail;
     ImageView imgDetail;
     TextView txtNameDetail, txtPriceDetail, txtDescription, txtSl;
-    Spinner spinner;
+    Spinner spSluong, spPloai;
     Button btnOrder, btnBuy;
 
     @Override
@@ -61,7 +61,8 @@ public class ProductDetail extends AppCompatActivity {
         txtNameDetail = findViewById(R.id.txtnamedetail);
         txtPriceDetail = findViewById(R.id.txtpricedetail);
         txtDescription = findViewById(R.id.txtdescriptiondetail);
-        spinner = findViewById(R.id.spSluong);
+        spSluong = findViewById(R.id.spSluong);
+        spPloai = findViewById(R.id.spPloai);
         btnOrder = findViewById(R.id.btnorder);
         btnBuy = findViewById(R.id.btnbuy);
 
@@ -81,7 +82,7 @@ public class ProductDetail extends AppCompatActivity {
         btnOrder.setOnClickListener(e->{
                 Product item = (Product) ProductDetail.this.getIntent().getSerializableExtra("thongtin");
                 Order order = new Order(list.size(), item.getName(), Long.valueOf(item.getPrice()), item.getImage()
-                        , Integer.valueOf(spinner.getSelectedItem().toString()));
+                        , Integer.valueOf(spSluong.getSelectedItem().toString()));
                 OrderActivity.addProducts(order);
                 txtSl.setText(MainActivity.totalOrder());
                 Toast.makeText(ProductDetail.this.getBaseContext(), "Đã thêm sản phầm vào giỏ", Toast.LENGTH_SHORT).show();
@@ -95,7 +96,7 @@ public class ProductDetail extends AppCompatActivity {
         btnBuy.setOnClickListener(e->{
             Product item = (Product) ProductDetail.this.getIntent().getSerializableExtra("thongtin");
             Order order = new Order(list.size(), item.getName(), Long.valueOf(item.getPrice()), item.getImage()
-                    , Integer.valueOf(spinner.getSelectedItem().toString()));
+                    , Integer.valueOf(spSluong.getSelectedItem().toString()));
             Intent intent = new Intent(this, OrderedActivity.class);
             intent.putExtra("item", order);
             intent.setAction(BUY_GOODS_NOW);
@@ -163,13 +164,17 @@ public class ProductDetail extends AppCompatActivity {
         Integer[] size = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         ArrayAdapter<Integer> arrayAdapter =
                 new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_dropdown_item, size);
-        spinner.setAdapter(arrayAdapter);
+        spSluong.setAdapter(arrayAdapter);
+
+        String[] colors = new String[]{"Vàng","Xanh","Đỏ","Cam"};
+        ArrayAdapter<String> adapterColor = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, colors);
+        spPloai.setAdapter(adapterColor);
     }
 
     private void getInfomation() {
         Product item = (Product) getIntent().getSerializableExtra("thongtin");
-        TextView tittle = findViewById(R.id.txttitle);
-        tittle.setText(item.getName());
+        TextView txttitle = findViewById(R.id.txtTitle);
+        txttitle.setText(item.getName());
 
         txtNameDetail.setText(item.getName());
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");

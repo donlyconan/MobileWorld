@@ -1,5 +1,20 @@
 package com.letuan.mobileworld.activity;
 
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.ViewFlipper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -10,29 +25,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.media.session.PlaybackState;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.ViewFlipper;
-
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.navigation.NavigationView;
 import com.letuan.mobileworld.R;
 import com.letuan.mobileworld.adapter.CategoryAdapter;
 import com.letuan.mobileworld.adapter.ProductAdapter;
@@ -49,13 +46,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -69,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     ViewFlipper viewFlipper;
     RecyclerView recyclerView;
-    NavigationView navigationView;
     ListView listViewManHinhChinh;
     DrawerLayout drawerLayout;
     List<Category> categoryList;
@@ -92,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         viewFlipper = findViewById(R.id.viewflipper);
         actionViewFlipper();
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             productList = createItems();
@@ -108,13 +98,14 @@ public class MainActivity extends AppCompatActivity {
 
         final ImageButton btGioHang =  findViewById(R.id.btGiohang);
         btGioHang.setOnClickListener(e->{
-            Intent intent = new Intent(this,OrderActivity.class);
+            Intent intent = new Intent(this, OrderActivity.class);
             startActivityForResult(intent, ProductDetail.REPLACE_SIZE);
             CustomIntent.customType(this, com.letuan.mobileworld.activity.Animation.LEFT_TO_RIGHT);
         });
 
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(e->{
-
+            drawer.openDrawer(GravityCompat.START);
         });
 
 

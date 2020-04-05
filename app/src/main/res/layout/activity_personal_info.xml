@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
-
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,7 +22,10 @@
             android:visibility="visible"
             app:navigationIcon="@drawable/ic_back"
             app:title="Thông tin cá nhân"
-            app:titleTextColor="#fff"></androidx.appcompat.widget.Toolbar>
+            app:titleTextColor="#fff"
+            app:menu="@menu/menu_info">
+
+        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -70,8 +72,10 @@
                 android:background="#00000000"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/circleImageView">
+                app:layout_constraintTop_toBottomOf="@+id/circleImageView"
+                app:layout_constraintVertical_bias="0.0">
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -121,6 +125,7 @@
                         android:layout_marginLeft="20dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
+                        android:editable="false"
                         android:ems="10"
                         android:gravity="right"
                         android:inputType="textPersonName"
@@ -302,6 +307,7 @@
             android:gravity="right"
             android:inputType="textPersonName"
             android:lines="10"
+            android:maxLines="5"
             android:padding="5dp"
             android:text="328/6/1 Hoàng Hoa Thám, Ba Đình, Hà Nội"
             android:textSize="15sp" />
