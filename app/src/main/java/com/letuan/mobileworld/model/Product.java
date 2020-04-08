@@ -6,13 +6,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class Product implements Serializable {
-
-    public  static final String ID = "id";
-    public  static final String NAME = "name";
-    public  static final String PRICE = "pri";
-    public  static final String IMAGE = "img";
-    public  static final String DESCRIPTION = "des";
-    public  static final String CATEGORY = "cateid";
+    public  static final int PL_SMARTPHONE = 100;
+    public  static final int PL_LAPTOP = 200;
 
     private int id;
     private String name;
@@ -20,15 +15,8 @@ public class Product implements Serializable {
     private String image;
     private String description;
     private int categoryid;
+    private int lsanpham = PL_SMARTPHONE;
 
-    public Product(JSONObject json) throws JSONException {
-        id = json.getInt(ID);
-        name = json.getString(NAME);
-        price = json.getInt(PRICE);
-        image = json.getString(IMAGE);
-        description = json.getString(DESCRIPTION);
-        categoryid = json.getInt(CATEGORY);
-    }
 
     public Product(int id, String name, Integer price, String image, String description, int categoryid) {
         this.id = id;
@@ -85,5 +73,13 @@ public class Product implements Serializable {
 
     public void setCategoryid(int categoryid) {
         this.categoryid = categoryid;
+    }
+
+    public int getLsanpham() {
+        return lsanpham;
+    }
+
+    public void setLsanpham(int lsanpham) {
+        this.lsanpham = lsanpham;
     }
 }

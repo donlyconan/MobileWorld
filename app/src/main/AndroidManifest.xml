@@ -17,7 +17,8 @@
         <activity android:name=".activity.OrderActivity" />
         <activity android:name=".activity.ProductDetail" />
         <activity android:name=".activity.ContactActivity" />
-        <activity android:name=".activity.InfoAppActivity" />
+        <activity android:name=".activity.PersonalInfoActivity" />
+        <activity android:name=".activity.SignupActivity" />
         <activity android:name=".activity.PhoneActivity" />
         <activity android:name=".activity.MainActivity">
             <intent-filter>

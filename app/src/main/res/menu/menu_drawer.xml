@@ -3,24 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item android:title="Shopping"
-        >
-        <menu>
-            <item
-                android:id="@+id/nav_home"
-                android:title="Trang chủ" />
-            <item
-                android:id="@+id/nav_gallery"
-                android:title="Điện thoại" />
-            <item
-                android:id="@+id/nav_slideshow"
-                android:title="Laptop" />
+    <group android:checkableBehavior="all">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/img_home"
+            android:title="Trang chủ" />
+        <item
+            android:id="@+id/nav_phone"
+            android:icon="@drawable/img_phone"
+            android:title="Điện thoại" />
+        <item
+            android:id="@+id/nav_laptop"
+            android:icon="@drawable/img_laptop"
+            android:title="Laptop" />
+    </group>
 
-        </menu>
-
-    </item>
-
-    <item android:title="Liên kết">
+    <item
+        android:title="Liên kết">
         <menu>
             <item
                 android:title="Facebook" />
@@ -32,10 +31,12 @@
     <item android:title="Tài khoản">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_user"
+                android:icon="@drawable/img_user"
                 android:title="Thông tin tài khoản" />
             <item
-                android:id="@+id/nav_send"
+                android:id="@+id/nav_logut"
+                android:icon="@drawable/img_logout"
                 android:title="Đăng xuất" />
         </menu>
     </item>

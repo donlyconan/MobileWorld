@@ -12,7 +12,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
-        android:padding="8dp"
+        android:paddingBottom="5dp"
         app:cardCornerRadius="5dp">
 
         <FrameLayout
@@ -20,6 +20,7 @@
             android:layout_height="match_parent">
 
             <ImageView
+                android:id="@+id/img_new"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="top|right"
@@ -30,14 +31,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:minWidth="150dp"
                 android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:padding="5dp">
 
                 <ImageView
                     android:id="@+id/imgproduct"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/ip_xi"
                     android:maxHeight="150dp" />
@@ -46,11 +47,12 @@
                     android:id="@+id/txtproductname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="10dp"
                     android:gravity="center"
+                    android:maxLines="2"
                     android:text="IPhone XI - Newboxs"
-                    android:textColor="#000"
-                    android:textSize="18sp" />
+                    android:textColor="#F2000000"
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/txtproductprice"
@@ -61,7 +63,7 @@
                     android:gravity="center"
                     android:text="28.930.000 đ"
                     android:textColor="#f00"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
         </FrameLayout>
     </androidx.cardview.widget.CardView>

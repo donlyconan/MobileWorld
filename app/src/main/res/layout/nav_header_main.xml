@@ -6,11 +6,12 @@
     android:layout_height="wrap_content"
     android:background="@color/colorToolbar"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="15dp"
+    >
 
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imgProfit"
+        android:id="@+id/img_profit"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:src="@drawable/ic_profit"
@@ -20,7 +21,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/txt_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -30,12 +31,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.444"
-        app:layout_constraintStart_toEndOf="@+id/imgProfit"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintStart_toEndOf="@+id/img_profit"
+        app:layout_constraintTop_toBottomOf="@+id/txt_fullname"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/txt_fullname"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -45,7 +46,7 @@
         android:textSize="21sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imgProfit"
+        app:layout_constraintStart_toEndOf="@+id/img_profit"
         app:layout_constraintTop_toTopOf="parent" />
 
 

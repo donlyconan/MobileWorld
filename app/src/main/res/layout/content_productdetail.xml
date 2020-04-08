@@ -22,7 +22,6 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:minHeight="200dp"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -34,7 +33,7 @@
             <ImageView
                 android:id="@+id/imgdetail"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="300dp"
                 android:layout_weight="1"
                 android:maxHeight="300dp"
                 app:srcCompat="@drawable/ip_xi" />
@@ -55,22 +54,17 @@
                 android:id="@+id/txtpricedetail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="8dp"
                 android:layout_weight="1"
                 android:text="28.950.000 đ"
                 android:textColor="#f20"
                 android:textSize="18sp" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-            </FrameLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp">
@@ -96,6 +90,16 @@
                 </Spinner>
 
             </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/frag_info_product"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:minHeight="10dp">
+
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/txtProductDetail"

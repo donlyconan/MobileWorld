@@ -26,11 +26,11 @@ import maes.tech.intentanim.CustomIntent;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHolder> {
 
-    Activity activity;
+    MainActivity activity;
     List<Product> productList;
 
     public ProductAdapter(Activity activity, List<Product> productList) {
-        this.activity = activity;
+        this.activity = (MainActivity) activity;
         this.productList = productList;
     }
 
@@ -50,9 +50,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
         holder.txtNameProduct.setText(product.getName());
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
         holder.txtPriceProduct.setText("Giá : " + decimalFormat.format(product.getPrice()) + " Đ");
-        Picasso.with(activity.getBaseContext()).load(product.getImage()).fit().centerCrop().placeholder(R.drawable.no_image_icon)
-                .error(R.drawable.error).into(holder.imgProduct);
 
+        //Load anh tu URL
+        Picasso.with(activity).load(product.getImage())
+                .placeholder(R.drawable.no_image_icon)
+                .fit().centerCrop()
+                .error(R.drawable.error)
+                .into(holder.imgProduct);
+
+
+        //Chay activity thong tin chi tiet san pham
         holder.view.setOnClickListener(e->{
             Intent intent = new Intent(activity, ProductDetail.class);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -85,13 +85,15 @@ public class OrderAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.item_order, null);
             holder = new ViewHolder(view);
 
-            Picasso.with(activity).load(order.getImageProduct()).fit().centerCrop().placeholder(R.drawable.no_image_icon)
+            Picasso.with(activity).load(order.getImageProduct()).placeholder(R.drawable.no_image_icon)
+                    .fit().centerCrop()
                     .error(R.drawable.error).into(holder.imgOrder);
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
         }
         final TextView txtMoney = activity.findViewById(R.id.txtThanhTien);
+        CheckBox ckSelALL = activity.findViewById(R.id.ckSelAll);
 
         holder.txtNameOrder.setText(order.getNameProduct());
         holder.txtPriceOrder.setText(formatMoney(order.getTongSoTien()));
@@ -100,8 +102,16 @@ public class OrderAdapter extends BaseAdapter {
 
         holder.ckSel.setOnCheckedChangeListener((b, e) ->{
             orderList.get(position).setSel(e);
+            boolean ckall = true;
+            for(Order item : orderList)
+            {
+                ckall &= item.isSel();
+                if(ckall == false) break;
+            }
+            ckSelALL.setChecked(ckall);
             txtMoney.setText(OrderActivity.updateGoods());
         } );
+
         holder.btnPlus.setOnClickListener(e -> {
             holder.btnMinus.setEnabled(true);
             order.setSize(order.getSize() + 1);

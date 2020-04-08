@@ -3,8 +3,10 @@ package com.letuan.mobileworld.activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Build;
@@ -19,12 +21,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.letuan.mobileworld.R;
+import com.letuan.mobileworld.fragment.InfoLaptopFragment;
+import com.letuan.mobileworld.fragment.InfoSmarphoneFragement;
 import com.letuan.mobileworld.model.Order;
 import com.letuan.mobileworld.model.Product;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import maes.tech.intentanim.CustomIntent;
 
@@ -41,12 +46,15 @@ public class ProductDetail extends AppCompatActivity {
     TextView txtNameDetail, txtPriceDetail, txtDescription, txtSl;
     Spinner spSluong, spPloai;
     Button btnOrder, btnBuy;
+    FragmentManager fmanager;
+    InfoSmarphoneFragement fphone;
+    InfoLaptopFragment flatop;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == REPLACE_SIZE)
+        if (requestCode == REPLACE_SIZE)
             txtSl.setText(MainActivity.totalOrder());
     }
 
@@ -56,6 +64,7 @@ public class ProductDetail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
 
+        //Anh xa phan tu
         toolbarDetail = findViewById(R.id.toolbardetail);
         imgDetail = findViewById(R.id.imgdetail);
         txtNameDetail = findViewById(R.id.txtnamedetail);
@@ -65,37 +74,52 @@ public class ProductDetail extends AppCompatActivity {
         spPloai = findViewById(R.id.spPloai);
         btnOrder = findViewById(R.id.btnorder);
         btnBuy = findViewById(R.id.btnbuy);
-
         txtSl = findViewById(R.id.txtSoluong);
         final ImageButton btGioHang = findViewById(R.id.btGiohang);
 
-        btGioHang.setOnClickListener(e->{
+
+        //Xu ly su kien
+        btGioHang.setOnClickListener(e -> {
             Intent intent = new Intent(this, OrderActivity.class);
             intent.setAction(PRODUCT_OPEN_ORDER);
-            startActivityForResult(intent,REPLACE_SIZE);
+            startActivityForResult(intent, REPLACE_SIZE);
             CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
         });
 
         final List<Order> list = MainActivity.OrderList;
         txtSl.setText(MainActivity.totalOrder());
 
-        btnOrder.setOnClickListener(e->{
-                Product item = (Product) ProductDetail.this.getIntent().getSerializableExtra("thongtin");
-                Order order = new Order(list.size(), item.getName(), Long.valueOf(item.getPrice()), item.getImage()
-                        , Integer.valueOf(spSluong.getSelectedItem().toString()));
-                OrderActivity.addProducts(order);
-                txtSl.setText(MainActivity.totalOrder());
-                Toast.makeText(ProductDetail.this.getBaseContext(), "Đã thêm sản phầm vào giỏ", Toast.LENGTH_SHORT).show();
-         });
+        //Lay thong tin san pham
+        final Product item = (Product) ProductDetail.this.getIntent().getSerializableExtra("thongtin");
+        btnOrder.setOnClickListener(e -> {
+            boolean contain = false;
+            int size = 0;
 
-        toolbarDetail.setNavigationOnClickListener((e)->{
-            finish();
-            CustomIntent.customType(this,Animation.RIGHT_TO_LEFT);
+            for (Order order : OrderList)
+                if (order.getId() == item.getId()){
+                    size = order.getSize();
+                    contain = true;
+                }
+
+            size += Integer.valueOf(spSluong.getSelectedItem().toString());
+
+            if (contain)
+                new AlertDialog.Builder(ProductDetail.this).setTitle("Mobile Word")
+                        .setMessage("Sản phầm này đã tồn tại trong giỏ hàng của bạn!").setNegativeButton("Thêm",(ex,id)->buyGoods(item))
+                        .setPositiveButton("Bỏ qua", null).show();
+
+            else
+                buyGoods(item);
+
         });
 
-        btnBuy.setOnClickListener(e->{
-            Product item = (Product) ProductDetail.this.getIntent().getSerializableExtra("thongtin");
-            Order order = new Order(list.size(), item.getName(), Long.valueOf(item.getPrice()), item.getImage()
+        toolbarDetail.setNavigationOnClickListener((e) -> {
+            finish();
+            CustomIntent.customType(this, Animation.RIGHT_TO_LEFT);
+        });
+
+        btnBuy.setOnClickListener(e -> {
+            Order order = new Order(item.getId(), item.getName(), Long.valueOf(item.getPrice()), item.getImage()
                     , Integer.valueOf(spSluong.getSelectedItem().toString()));
             Intent intent = new Intent(this, OrderedActivity.class);
             intent.putExtra("item", order);
@@ -105,11 +129,34 @@ public class ProductDetail extends AppCompatActivity {
         });
 
 
+        fmanager = getSupportFragmentManager();
+
+        //Chuyen doi thong tin ky thuat san pham
+        if (item.getLsanpham() == Product.PL_SMARTPHONE) {
+            fphone = new InfoSmarphoneFragement();
+            fmanager.beginTransaction().replace(R.id.frag_info_product, fphone).commit();
+        }
+
+        if (item.getLsanpham() == Product.PL_LAPTOP) {
+            flatop = new InfoLaptopFragment();
+            fmanager.beginTransaction().replace(R.id.frag_info_product, flatop).commit();
+        }
 
 //        actionToolbar();
         getInfomation();
         catchEventSpinner();
 //        catchEventButtonAddOrder();
+    }
+
+    //them hang vao gio
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void buyGoods(Product item)
+    {
+        Order order = new Order(item.getId(), item.getName(), Long.valueOf(item.getPrice()), item.getImage()
+                , Integer.valueOf(spSluong.getSelectedItem().toString()));
+        OrderActivity.addProducts(order);
+        txtSl.setText(MainActivity.totalOrder());
+        Toast.makeText(ProductDetail.this.getBaseContext(), "Đã thêm sản phầm vào giỏ", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -166,7 +213,7 @@ public class ProductDetail extends AppCompatActivity {
                 new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_dropdown_item, size);
         spSluong.setAdapter(arrayAdapter);
 
-        String[] colors = new String[]{"Vàng","Xanh","Đỏ","Cam"};
+        String[] colors = new String[]{"Vàng", "Xanh", "Đỏ", "Cam"};
         ArrayAdapter<String> adapterColor = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, colors);
         spPloai.setAdapter(adapterColor);
     }
@@ -180,7 +227,7 @@ public class ProductDetail extends AppCompatActivity {
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
         txtPriceDetail.setText("Giá: " + decimalFormat.format(item.getPrice()) + " $");
         txtDescription.setText(item.getDescription());
-        Picasso.with(getApplicationContext()).load(item.getImage()).fit().centerCrop().placeholder(R.drawable.error)
+        Picasso.with(getApplicationContext()).load(item.getImage()).fit().centerCrop()
                 .error(R.drawable.error).into(imgDetail);
     }
 

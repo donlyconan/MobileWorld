@@ -1,5 +1,6 @@
 package com.letuan.mobileworld.activity;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -31,6 +32,7 @@ import maes.tech.intentanim.CustomIntent;
 
 public class OrderActivity extends AppCompatActivity {
     public static final List<Order> OrderList = MainActivity.OrderList;
+    public static Long tongtien = 0L;
 
     ListView listViewOrder;
     static TextView txtThanhTien;
@@ -38,7 +40,16 @@ public class OrderActivity extends AppCompatActivity {
     CheckBox ckSelAll;
     Toolbar toolbarOrder;
     OrderAdapter orderAdapter;
-    public static Long tongtien = 0L;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 10) {
+            orderAdapter.notifyDataSetChanged();
+            if (orderAdapter.getSize() == 0) ckSelAll.setChecked(false);
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -46,30 +57,51 @@ public class OrderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
+        //Anh xa [han tu
         listViewOrder = findViewById(R.id.listvieworder);
         txtThanhTien = findViewById(R.id.txtThanhTien);
         btnThanhToan = findViewById(R.id.btMuaHang);
         toolbarOrder = findViewById(R.id.toolbarorder);
-        toolbarOrder.setNavigationOnClickListener(e -> {
-            finish();
-            CustomIntent.customType(OrderActivity.this, Animation.RIGHT_TO_LEFT);
-        });
 
+
+        //Cai dat listview
         orderAdapter = new OrderAdapter(OrderActivity.this, OrderList);
         listViewOrder.setAdapter(orderAdapter);
 
         ckSelAll = findViewById(R.id.ckSelAll);
         ckSelAll.setChecked(true);
-        ckSelAll.setOnCheckedChangeListener((b, e) -> {
-            OrderList.forEach(es -> es.setSel(e));
+        //Xu ly su kien
+        ckSelAll.setOnClickListener((e) -> {
+            OrderList.forEach(es -> es.setSel(ckSelAll.isChecked()));
             orderAdapter.notifyDataSetChanged();
             txtThanhTien.setText(updateGoods());
         });
 
-        btnThanhToan.setOnClickListener(e->{
-            Intent intent = new Intent(OrderActivity.this, OrderedActivity.class);
-            startActivity(intent);
-            CustomIntent.customType(OrderActivity.this, Animation.LEFT_TO_RIGHT);
+        toolbarOrder.setNavigationOnClickListener(e -> {
+            finish();
+            CustomIntent.customType(OrderActivity.this, Animation.RIGHT_TO_LEFT);
+        });
+
+        btnThanhToan.setOnClickListener(e -> {
+            boolean canbuy = false;
+            //Kiem tra danhsach chon
+            for (Order order : OrderList)
+                if (order.isSel()) {
+                    canbuy = true;
+                    break;
+                }
+
+            //Kiem tra co the mua hay khong
+            if (!canbuy) {
+                String text = OrderList.size() == 0 ? "Danh sách trống!" : "Bạn chưa chọn sản phầm cần mua";
+                Toast.makeText(OrderActivity.this, text, Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                Intent intent = new Intent(OrderActivity.this, OrderedActivity.class);
+                startActivityForResult(intent, 10);
+                CustomIntent.customType(OrderActivity.this, Animation.LEFT_TO_RIGHT);
+            }
+
         });
 
         listViewOrder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -87,11 +119,11 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static String updateGoods(){
+    public static String updateGoods() {
         long sum = 0l;
-        for(Order order : OrderList) if(order.isSel()) sum += order.getTongSoTien();
+        for (Order order : OrderList) if (order.isSel()) sum += order.getTongSoTien();
         DecimalFormat format = new DecimalFormat("###,###,###");
-       return format.format(sum) + " đ";
+        return format.format(sum) + " đ";
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
