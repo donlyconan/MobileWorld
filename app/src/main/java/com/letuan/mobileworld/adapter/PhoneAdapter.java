@@ -67,7 +67,7 @@ public class PhoneAdapter extends BaseAdapter {
         viewHolder.txtPhoneDescription.setText(product.getDescription());
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
         viewHolder.txtPhonePrice.setText("Giá: " + decimalFormat.format(product.getPrice()) + " Đ");
-        Picasso.with(context).load(product.getImage()).placeholder(R.drawable.no_image_icon)
+        Picasso.get().load(product.getImage()).placeholder(R.drawable.no_image_icon)
                 .error(R.drawable.error).into(viewHolder.imgPhone);
         return view;
     }

@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -13,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -36,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String MAIN_OPEN_ORDER = "MAIN_OPEN_ORDER";
     public static final List<Order> OrderList = new ArrayList<>();
 
-    Toolbar toolbar;
+    ImageButton btnNav;
     DrawerLayout drawer;
     CategoryAdapter categoryAdapter;
     TextView txtSLuong;
@@ -44,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     CustomViewFragement fragcview;
     LoadFragement fragload;
     List<GoodsReview> goods;
+    SearchView searchView;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -63,8 +63,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer = findViewById(R.id.drawer_layout);
         txtSLuong = findViewById(R.id.txtSoluong);
         txtSLuong.setText(totalOrder());
-        toolbar = findViewById(R.id.toolbar);
+        btnNav = findViewById(R.id.btn_nav);
         final ImageButton btGioHang = findViewById(R.id.btGiohang);
+        searchView = findViewById(R.id.search_bar);
 
         //Xu ly su kien
         btGioHang.setOnClickListener(e -> {
@@ -72,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivityForResult(intent, ProductDetail.REPLACE_SIZE);
             CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
         });
-        toolbar.setNavigationOnClickListener(e -> {
+
+        btnNav.setOnClickListener(e -> {
             drawer.openDrawer(GravityCompat.START);
         });
 
@@ -193,6 +195,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
             break;
+            case R.id.nav_bill:{
+                Intent intent = new Intent(MainActivity.this, BillActivity.class);
+                startActivity(intent);
+                CustomIntent.customType(this, com.letuan.mobileworld.activity.Animation.LEFT_TO_RIGHT);
+            }
+            break;
             case R.id.nav_user: {
                 Intent intent = new Intent(MainActivity.this, PersonalInfoActivity.class);
                 startActivity(intent);
@@ -275,17 +283,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //    //bắt sự kiện chạy quảng cáo (slider)
 
     // bắt sự kiện đóng mở action bar
-    private void actionBar() {
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationIcon(android.R.drawable.ic_menu_sort_by_size);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
-    }
-
 
 }

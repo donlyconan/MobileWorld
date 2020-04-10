@@ -81,7 +81,7 @@ public class CustomViewFragement extends Fragment {
 
         for (int i = 0; i < mangQuangCao.size(); i++) {
             ImageView imageView = new ImageView(getActivity());
-            Picasso.with(getContext()).load(mangQuangCao.get(i)).error(R.drawable.error).into(imageView);
+            Picasso.get().load(mangQuangCao.get(i)).error(R.drawable.error).into(imageView);
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             holder.flipper.addView(imageView);
         }

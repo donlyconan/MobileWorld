@@ -6,7 +6,10 @@
     android:layout_height="wrap_content"
     android:background="@color/colorToolbar"
     android:orientation="vertical"
-    android:padding="15dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="5dp"
     >
 
 

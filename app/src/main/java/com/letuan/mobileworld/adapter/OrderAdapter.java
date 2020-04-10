@@ -85,7 +85,7 @@ public class OrderAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.item_order, null);
             holder = new ViewHolder(view);
 
-            Picasso.with(activity).load(order.getImageProduct()).placeholder(R.drawable.no_image_icon)
+            Picasso.get().load(order.getImageProduct()).placeholder(R.drawable.no_image_icon)
                     .fit().centerCrop()
                     .error(R.drawable.error).into(holder.imgOrder);
             view.setTag(holder);

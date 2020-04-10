@@ -17,6 +17,7 @@ import com.letuan.mobileworld.activity.Animation;
 import com.letuan.mobileworld.activity.MainActivity;
 import com.letuan.mobileworld.activity.ProductDetail;
 import com.letuan.mobileworld.model.Product;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -52,10 +53,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
         holder.txtPriceProduct.setText("Giá : " + decimalFormat.format(product.getPrice()) + " Đ");
 
         //Load anh tu URL
-        Picasso.with(activity).load(product.getImage())
+        Picasso.get().load(product.getImage())
                 .placeholder(R.drawable.no_image_icon)
-                .fit().centerCrop()
                 .error(R.drawable.error)
+                .fit()
                 .into(holder.imgProduct);
 
 

@@ -1,9 +1,5 @@
 package com.letuan.mobileworld.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,23 +12,13 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.letuan.mobileworld.R;
 import com.letuan.mobileworld.adapter.PhoneAdapter;
-import com.letuan.mobileworld.dialog.DialogCheck;
-import com.letuan.mobileworld.mapper.ProductMapper;
 import com.letuan.mobileworld.model.Product;
-import com.letuan.mobileworld.ultil.CheckWifiValid;
-import com.letuan.mobileworld.ultil.Server;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,16 +41,16 @@ public class PhoneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone);
         anhxa();
-        if (CheckWifiValid.haveNetworkConnection(getApplicationContext())) {
+//        if (CheckWifiValid.haveNetworkConnection(getApplicationContext())) {
             getCategoryId();
             actionToolBar();
-            getData(page);
+//            getData(page);
             loadMoreData();
-        } else {
-            DialogCheck dialogCheck = new DialogCheck(PhoneActivity.this);
-            dialogCheck.setNotification(PhoneActivity.class, PhoneActivity.this);
-            dialogCheck.show();
-        }
+//        } else {
+//            DialogCheck dialogCheck = new DialogCheck(PhoneActivity.this);
+//            dialogCheck.setNotification(PhoneActivity.class, PhoneActivity.this);
+//            dialogCheck.show();
+//        }
     }
 
     @Override
@@ -110,37 +96,37 @@ public class PhoneActivity extends AppCompatActivity {
         });
     }
 
-    private void getData(int _page) {
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        String urlPhone = Server.urlGetProductNewest + id + "?page=" + _page;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, urlPhone,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        if (response != null && response.length() != 2) { // do cap ngoac vuong
-                            listView.removeFooterView(footerView);
-                            try {
-                                JSONArray jsonArray = new JSONArray(response);
-                                ProductMapper.mapper(jsonArray, phoneList);
-                                phoneAdapter.notifyDataSetChanged();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            limitData = true;
-                            listView.removeFooterView(footerView);
-                            CheckWifiValid.ShowToast_Short(getApplicationContext(), "Hết dữ liệu rồi");
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        CheckWifiValid.ShowToast_Short(getApplicationContext(), "404 Not Found");
-                    }
-                });
-        requestQueue.add(stringRequest);
-    }
+//  /  private void getData(int _page) {
+//        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+//        String urlPhone = Server.urlGetProductNewest + id + "?page=" + _page;
+//        StringRequest stringRequest = new StringRequest(Request.Method.GET, urlPhone,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        if (response != null && response.length() != 2) { // do cap ngoac vuong
+//                            listView.removeFooterView(footerView);
+//                            try {
+//                                JSONArray jsonArray = new JSONArray(response);
+//                                ProductMapper.mapper(jsonArray, phoneList);
+//                                phoneAdapter.notifyDataSetChanged();
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        } else {
+//                            limitData = true;
+//                            listView.removeFooterView(footerView);
+//                            CheckWifiValid.ShowToast_Short(getApplicationContext(), "Hết dữ liệu rồi");
+//                        }
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        CheckWifiValid.ShowToast_Short(getApplicationContext(), "404 Not Found");
+//                    }
+//                });
+//        requestQueue.add(stringRequest);
+//    }
 
     private void actionToolBar() {
         setSupportActionBar(toolbarPhone);
@@ -181,7 +167,7 @@ public class PhoneActivity extends AppCompatActivity {
                     listView.addFooterView(footerView);
                     break;
                 case 1:
-                    getData(++page);
+//                    getData(++page);
                     isLoading = false;
                     break;
             }

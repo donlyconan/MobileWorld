@@ -227,7 +227,7 @@ public class ProductDetail extends AppCompatActivity {
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
         txtPriceDetail.setText("Giá: " + decimalFormat.format(item.getPrice()) + " $");
         txtDescription.setText(item.getDescription());
-        Picasso.with(getApplicationContext()).load(item.getImage()).fit().centerCrop()
+        Picasso.get().load(item.getImage()).fit().centerCrop()
                 .error(R.drawable.error).into(imgDetail);
     }
 

@@ -60,7 +60,7 @@ public class CategoryAdapter extends BaseAdapter {
         viewHolder.txtCategoryName.setText(category.getCategoryName());
 
         if (category.getCategoryImage().contains("http")) {
-            Picasso.with(context).load(category.getCategoryImage()).into(viewHolder.imgCategory);
+            Picasso.get().load(category.getCategoryImage()).into(viewHolder.imgCategory);
         } else {
             viewHolder.imgCategory.setImageResource(Integer.parseInt(category.getCategoryImage()));
         }

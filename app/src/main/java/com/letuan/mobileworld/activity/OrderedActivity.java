@@ -58,7 +58,7 @@ public class OrderedActivity extends AppCompatActivity {
         txtTTien = findViewById(R.id.txtTTien);
         txtaddress = findViewById(R.id.txtaddress);
         txtname = findViewById(R.id.txtname);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         recycler = findViewById(R.id.recycle_view);
         btnDhang = findViewById(R.id.btnbuy);
         final ImageButton btnedit = findViewById(R.id.btnedit);
@@ -82,7 +82,7 @@ public class OrderedActivity extends AppCompatActivity {
 
         btnedit.setOnClickListener(e -> {
             Intent intent = new Intent(OrderedActivity.this, PersonalInfoActivity.class);
-            intent.setAction(AC_OPEN_EDIT_ADD);
+            intent.setAction(Intent.ACTION_EDIT);
             startActivityForResult(intent, 10);
             CustomIntent.customType(OrderedActivity.this, Animation.LEFT_TO_RIGHT);
         });

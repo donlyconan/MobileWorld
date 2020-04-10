@@ -39,7 +39,7 @@ public class OrderedApdater extends RecyclerView.Adapter<OrderedApdater.ItemHold
     public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
         Order item = list.get(position);
 
-        Picasso.with(activity).load(item.getImageProduct()).placeholder(R.drawable.no_image_icon)
+        Picasso.get().load(item.getImageProduct()).placeholder(R.drawable.no_image_icon)
                 .fit().centerCrop()
                 .error(R.drawable.error)
                 .into(holder.imgSanpham);

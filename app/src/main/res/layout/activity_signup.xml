@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="8dp"
-            android:hint="Name"
+            android:hint="Họ và tên"
             android:inputType="textPersonName"
             android:textColor="#FFFFFF"
             android:textColorHint="#DFDFDF" />
@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:hint="Address"
+            android:hint="Địa chỉ"
             android:inputType="textPostalAddress"
             android:textColor="#FFFFFF"
             android:textColorHint="#DFDFDF" />
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:hint="Email"
+            android:hint="Mật khẩu"
             android:inputType="textEmailAddress"
             android:textColor="#FFFFFF"
             android:textColorHint="#DFDFDF" />
@@ -77,7 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:hint="Password"
+            android:hint="Mật khẩu"
             android:inputType="textPassword"
             android:textColor="#FFFFFF"
             android:textColorHint="#DFDFDF" />
@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:hint="Re-enter Password"
+            android:hint="Nhập lại mật khẩu"
             android:inputType="textPassword"
             android:textColor="#FFFFFF"
             android:textColorHint="#DFDFDF" />
@@ -144,7 +144,7 @@
             android:layout_marginTop="45dp"
             android:background="@drawable/shape_signup"
             android:padding="12dp"
-            android:text="SIGN UP"
+            android:text="Đăng ký"
             android:textColor="#fff"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -160,7 +160,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Already a member?"
+                android:text="Gia nhập cộng đồng?"
                 android:textColor="#DFDFDF"
                 android:textSize="16dip" />
 
@@ -169,7 +169,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
-                android:text="Login now"
+                android:text="Đăng nhập"
                 android:textColor="#03A9F4"
                 android:textSize="16sp" />
         </LinearLayout>

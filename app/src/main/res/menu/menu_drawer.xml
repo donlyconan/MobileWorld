@@ -10,7 +10,7 @@
             android:title="Trang chủ" />
         <item
             android:id="@+id/nav_phone"
-            android:icon="@drawable/img_phone"
+            android:icon="@drawable/img_smartphone"
             android:title="Điện thoại" />
         <item
             android:id="@+id/nav_laptop"
@@ -22,14 +22,17 @@
         android:title="Liên kết">
         <menu>
             <item
+                android:id="@+id/nav_fb"
+                android:icon="@drawable/img_facebook"
                 android:title="Facebook" />
-            <item
-                android:title="Zalo" />
         </menu>
     </item>
 
     <item android:title="Tài khoản">
         <menu>
+            <item android:id="@+id/nav_bill"
+                android:icon="@drawable/ic_bill"
+                android:title="Đặt mua"/>
             <item
                 android:id="@+id/nav_user"
                 android:icon="@drawable/img_user"
