@@ -24,7 +24,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/ic_back"
-            app:title="Giỏ hàng"
+            app:title="Đặt hàng"
             app:titleTextColor="#fff"
             tools:ignore="MissingConstraints" />
 

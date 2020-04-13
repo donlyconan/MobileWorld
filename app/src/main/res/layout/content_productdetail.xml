@@ -47,7 +47,7 @@
                 android:layout_weight="1"
                 android:text="Điện thoại Iphone X 64-256 bản quốc tế hàng zin keng"
                 android:textColor="#000"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -58,7 +58,17 @@
                 android:layout_weight="1"
                 android:text="28.950.000 đ"
                 android:textColor="#f20"
-                android:textSize="18sp" />
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/txttongsoluong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:textColor="#333131"
+                android:text="Số lượng tồn: 120 sản phẩm"
+                android:textSize="15sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -70,24 +80,24 @@
                 android:paddingBottom="5dp">
 
                 <Spinner
-                    android:id="@+id/spPloai"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/spinner" />
-
-                <Spinner
                     android:id="@+id/spSluong"
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="20dp"
                     android:layout_weight="1"
                     android:background="@drawable/spinner"
                     android:padding="5dp"
                     android:textAlignment="center">
 
                 </Spinner>
+
+                <Spinner
+                    android:id="@+id/spPloai"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner" />
 
             </LinearLayout>
 
@@ -109,7 +119,7 @@
                 android:layout_weight="1"
                 android:text="Chi tiết sản phẩm"
                 android:textColor="#000000"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -118,9 +128,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
-                android:text="TextView"
+                android:text="Content text"
                 android:textColor="#333131"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

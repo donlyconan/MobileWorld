@@ -19,7 +19,9 @@
         app:navigationIcon="@drawable/ic_back"
         app:title="Giỏ hàng"
         app:titleTextColor="#fff"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        app:menu="@menu/menu_order"
+        />
 
     <ListView
         android:id="@+id/listvieworder"

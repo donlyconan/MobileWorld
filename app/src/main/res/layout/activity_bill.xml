@@ -7,13 +7,10 @@
     android:orientation="vertical"
     tools:context=".activity.ResultSearchActivity">
 
-    <include layout="@layout/toolbar_result_search"
-        android:layout_weight="0"
-        android:layout_height="?actionBarSize"
-        android:layout_width="match_parent" />
+    <include layout="@layout/toolbar_result_search"/>
 
     <TextView
-        android:text="Đang đặt hàng"
+        android:text="Danh sách hàng hóa"
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="5dp"
@@ -30,25 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_weight="1"/>
-
-    <TextView
-        android:text="Đã nhận hàng"
-        android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:textColor="#000"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_height="wrap_content"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycle_dg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_weight="1"/>
-
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>
