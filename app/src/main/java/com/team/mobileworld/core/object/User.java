@@ -7,37 +7,45 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     private Account acc;
-    
+
     @SerializedName("id")
-    private String id ;
+    private String id;
 
-    @SerializedName("fullname") @Expose
-    private String fullname ;
+    @SerializedName("fullname")
+    @Expose
+    private String fullname;
 
-    @SerializedName("profit")  @Expose
-    private String profit ;
+    @SerializedName("profit")
+    @Expose
+    private String profit;
 
-    @SerializedName("email") @Expose
-    private String email ;
+    @SerializedName("email")
+    @Expose
+    private String email;
 
-    @SerializedName("bground") @Expose
-    private String bground ;
+    @SerializedName("bground")
+    @Expose
+    private String bground;
 
-    @SerializedName("bdate") @Expose
-    private String bdate ;
+    @SerializedName("bdate")
+    @Expose
+    private String bdate;
 
-    @SerializedName("address") @Expose
+    @SerializedName("address")
+    @Expose
     private String address;
 
-    @SerializedName("pnumber") @Expose
-    private String pnumber ;
+    @SerializedName("pnumber")
+    @Expose
+    private String pnumber;
 
-    @SerializedName("gender") @Expose
+    @SerializedName("gender")
+    @Expose
     private int gender = 0;
 
     private String token = null;
 
-    public User(Account acc, String id, String fullname, String email,String profit, String bground,
+    public User(Account acc, String id, String fullname, String email, String profit, String bground,
                 String bdate, int gender, String address, String pnumber) {
         this.acc = acc;
         this.id = id;
@@ -51,13 +59,18 @@ public class User implements Serializable {
         this.gender = gender;
     }
 
-    @Override
-	public String toString() {
-		return "User [acc=" + acc + ", id=" + id + ", fullname=" + fullname + ", profit=" + profit + ", email=" + email
-				+ ", bground=" + bground + ", bdate=" + bdate + ", address=" + address + ", pnumber=" + pnumber + "]";
-	}
+    public static String get(String text) {
+        return text == null ? "" : text;
+    }
 
-	public Account getAcc() {
+
+    @Override
+    public String toString() {
+        return "User [acc=" + acc + ", id=" + id + ", fullname=" + fullname + ", profit=" + profit + ", email=" + email
+                + ", bground=" + bground + ", bdate=" + bdate + ", address=" + address + ", pnumber=" + pnumber + "]";
+    }
+
+    public Account getAcc() {
         return acc;
     }
 
@@ -126,26 +139,23 @@ public class User implements Serializable {
     }
 
     public String getEmail() {
-		return email;
-	}
+        return email;
+    }
 
 
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
 
-	public String getToken() {
-		return token;
-	}
+    public String getToken() {
+        return token;
+    }
 
 
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-	public void setToken(String token) {
-		this.token = token;
-	}
-    
-    
+
 }

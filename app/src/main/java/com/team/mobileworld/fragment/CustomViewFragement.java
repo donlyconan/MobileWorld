@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
 import com.team.mobileworld.adapter.CustomListAdapter;
+import com.team.mobileworld.core.handle.ItemTest;
 import com.team.mobileworld.core.object.ItemList;
 
 import java.util.ArrayList;
@@ -38,10 +39,8 @@ public class CustomViewFragement extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public CustomViewFragement(List<ItemList> goods) {
-        goods.add(new ItemList("SẢN PHẦM MỚI", new ArrayList<>(), GRID));
-        goods.add(new ItemList("NỔI BẬT", new ArrayList<>(), HORIZONTAL));
-        goods.add(new ItemList("GIÁ SỐC", new ArrayList<>(), HORIZONTAL));
         this.goods = goods;
+        goods = ItemTest.getItemList();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

@@ -1,5 +1,14 @@
 package com.team.mobileworld.activity;
 
+import android.app.Activity;
+import android.content.Intent;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.facebook.login.Login;
+
+import maes.tech.intentanim.CustomIntent;
+
 public class Animation {
     public static final String LEFT_TO_RIGHT = "left-to-right";
     public static final String RIGHT_TO_LEFT = "right-to-left";

@@ -45,6 +45,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import maes.tech.intentanim.CustomIntent;
 import okhttp3.RequestBody;
@@ -57,7 +58,7 @@ import retrofit2.Retrofit;
 public class LoginActivity extends AppCompatActivity {
     public static final String TAG = "taglogin";
     public static final int REQUEST_SIGNUP = 200;
-    public static final int REQUEST_FBINFOUSER = 201;
+    public static final int ADD_INFO_USER = 201;
     public static final int REQUEST_INFOUSER = 202;
     public static final String ITEM_USER = "userinfo";
     public static final String OPEN_LOAD_USERINFO = "load user info";
@@ -126,8 +127,6 @@ public class LoginActivity extends AppCompatActivity {
                 // Start the Signup activity
                 Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
                 startActivityForResult(intent, REQUEST_SIGNUP);
-                finish();
-                CustomIntent.customType(LoginActivity.this, Animation.LEFT_TO_RIGHT);
             }
         });
     }
@@ -150,8 +149,7 @@ public class LoginActivity extends AppCompatActivity {
 
     //Tạo progressbar dialog custom
     public ProgressDialog createProgressBar(String text) {
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-        progressDialog.setContentView(R.layout.process_bar);
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this, R.color.colorForeign);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage(text);
         return progressDialog;
@@ -173,13 +171,14 @@ public class LoginActivity extends AppCompatActivity {
                     String urlimage = "http://graph.facebook.com/" + id + "/picture?type=large";
 
                     user = new User(null, id, name, email, urlimage, null, birthday, 0, null, null);
+                    user.setToken("TK" + new Random().nextLong());
                     Log.d(TAG, response.toString());
 
 
                     Intent intent = new Intent();
                     Log.d(TAG, "Send user: " + user.toString());
                     intent.putExtra(ITEM_USER, user);
-                    setResult(REQUEST_FBINFOUSER, intent);
+                    setResult(ADD_INFO_USER, intent);
                     finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -244,12 +243,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    public void finish() {
-        CustomIntent.customType(this, Animation.FADE_IN_TO_OUT);
-        super.finish();
-    }
-
-    @Override
     public void onBackPressed() {
         // Disable going back to the MainActivity
         moveTaskToBack(true);
@@ -288,4 +281,23 @@ public class LoginActivity extends AppCompatActivity {
 
         return valid;
     }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        super.startActivityForResult(intent, requestCode);
+        CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(this, Animation.FADE_IN_TO_OUT);
+    }
+
 }

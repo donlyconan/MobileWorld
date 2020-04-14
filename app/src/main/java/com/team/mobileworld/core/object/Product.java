@@ -45,6 +45,16 @@ public class Product implements Serializable {
 		this.categoryid = categoryid;
 	}
 
+	public Product(int id, String name, Integer price, String image, String description, int categoryid, int slmax) {
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.image = image;
+		this.description = description;
+		this.categoryid = categoryid;
+		this.slmax = slmax;
+	}
+
 	private boolean isSmartphone() {
 		return categoryid == 1;
 	}
@@ -104,4 +114,6 @@ public class Product implements Serializable {
 	public void setSlmax(int slmax) {
 		this.slmax = slmax;
 	}
+
+
 }

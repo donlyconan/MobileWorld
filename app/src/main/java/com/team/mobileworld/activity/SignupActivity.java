@@ -49,7 +49,6 @@ public class SignupActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
                 startActivity(intent);
                 finish();
-                CustomIntent.customType(SignupActivity.this, Animation.RIGHT_TO_LEFT);
             }
         });
     }
@@ -168,5 +167,23 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        super.startActivityForResult(intent, requestCode);
+        CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(this, Animation.RIGHT_TO_LEFT);
     }
 }

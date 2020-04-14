@@ -62,7 +62,7 @@ public class PhoneActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menucartorder:
-                Intent intent = new Intent(getApplicationContext(), OrderActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CartActivity.class);
                 startActivity(intent);
                 break;
         }

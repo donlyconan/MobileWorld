@@ -2,6 +2,7 @@ package com.team.mobileworld.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
@@ -16,6 +18,7 @@ import com.team.mobileworld.R;
 import com.team.mobileworld.activity.Animation;
 import com.team.mobileworld.activity.MainActivity;
 import com.team.mobileworld.activity.ProductDetail;
+import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.Product;
 
 import java.text.DecimalFormat;
@@ -28,9 +31,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
     MainActivity activity;
     List<Product> productList;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public ProductAdapter(Activity activity, List<Product> productList) {
         this.activity = (MainActivity) activity;
         this.productList = productList;
+        productList.removeIf(e->e.getSlmax() <= 0);
     }
 
     //khoi tao lai view ma da thiet ke layout o ben ngoai
@@ -38,8 +43,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
     @Override
     public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_productnewest, null);
-        ItemHolder itemHolder = new ItemHolder(v);
-        return itemHolder;
+        ItemHolder holder = new ItemHolder(v);
+
+        ImageView img = v.findViewById(R.id.imgproduct);
+        img.getLayoutParams().height = parent.getMeasuredWidth()/2 - 5;
+        img.getLayoutParams().width = parent.getMeasuredWidth()/2-5;
+        return holder;
     }
 
     //set va get thuoc tinh gan len cho layout

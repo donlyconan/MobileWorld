@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#cccccc"
-    tools:showIn="@layout/activity_ordered">
+    tools:showIn="@layout/activity_order">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -83,7 +83,7 @@
                     app:layout_constraintStart_toEndOf="@+id/imageView2"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <EditText
                     android:id="@+id/txtaddress"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -91,19 +91,20 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginRight="20dp"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/transparent"
                     android:maxLines="10"
+                    android:hint="Nhập địa chỉ..."
                     android:paddingLeft="5dp"
                     android:paddingTop="2dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="2dp"
-                    android:text="Donly Conan | (+84) 0941236644 \n183 Hoàng hoa thám, Ba đình, Hà nội"
                     android:textColor="#444444"
                     android:textSize="15sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/btnedit"
-                    app:layout_constraintStart_toEndOf="@+id/imageView2"
-                    app:layout_constraintTop_toBottomOf="@+id/txtname" />
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/imageView2" />
 
                 <ImageButton
                     android:id="@+id/btnedit"
@@ -114,6 +115,27 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_edit" />
+
+                <TextView
+                    android:id="@+id/txtinfoname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:hint="Username | Phone Number"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingRight="5dp"
+                    android:paddingBottom="2dp"
+                    android:textColor="#444444"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/txtaddress"
+                    app:layout_constraintEnd_toStartOf="@+id/btnedit"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/imageView2"
+                    app:layout_constraintTop_toBottomOf="@+id/txtname" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

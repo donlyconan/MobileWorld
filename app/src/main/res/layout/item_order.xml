@@ -2,112 +2,84 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/border_10dp"
-    android:orientation="horizontal"
-    android:paddingStart="5dp"
-    android:paddingLeft="5dp"
+    android:background="#fff"
+    android:paddingLeft="10dp"
     android:paddingTop="8dp"
+    android:paddingRight="10dp"
     android:paddingBottom="8dp">
 
     <ImageView
-        android:id="@+id/imgorder"
+        android:id="@+id/imgSpham"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
-        android:adjustViewBounds="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ckselect"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.372"
-        app:srcCompat="@drawable/home_page_icon" />
+        tools:srcCompat="@drawable/ip_xi" />
 
     <TextView
-        android:id="@+id/txtpriceorder"
+        android:id="@+id/txtproductname"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp"
-        android:paddingRight="5dp"
-        android:text="500.000 đ"
-        android:textColor="#f20"
-        android:textSize="14sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imgorder"
-        app:layout_constraintTop_toBottomOf="@+id/txtnameorder"
-        app:layout_constraintVertical_bias="0.48000002" />
-
-    <TextView
-        android:id="@+id/txtnameorder"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="4dp"
-        android:paddingRight="5dp"
-        android:text="LG G2 1908ML mode 4468"
-        android:textColor="#10100f"
+        android:layout_marginLeft="10dp"
+        android:lines="1"
+        android:padding="3dp"
+        android:paddingBottom="3dp"
+        android:text="IPhone XI"
+        android:textColor="#2E2C2C"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imgorder"
+        app:layout_constraintStart_toEndOf="@+id/imgSpham"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <TextView
+        android:id="@+id/txtprice"
         android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginLeft="15dp"
-        android:gravity="center"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
+        android:paddingBottom="3dp"
+        android:text="28.490.000 đ"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imgorder">
+        app:layout_constraintStart_toEndOf="@+id/imgSpham" />
 
-        <Button
-            android:id="@+id/btnminus"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:background="@drawable/shape_button_gtxml"
-            android:focusable="false"
-            android:text="-"
-            android:textSize="20sp" />
+    <TextView
+        android:id="@+id/txttype"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
+        android:paddingBottom="3dp"
+        android:text="Phân loại: Màu vàng 90%"
+        android:textColor="#5F5D5D"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toTopOf="@+id/txtamount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/imgSpham"
+        app:layout_constraintTop_toBottomOf="@+id/txtproductname" />
 
-        <TextView
-            android:id="@+id/txtnp"
-            android:layout_width="60dp"
-            android:layout_height="25dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:ems="10"
-            android:gravity="center"
-            android:inputType="textPersonName"
-            android:text="1" />
-
-        <Button
-            android:id="@+id/btnplus"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:background="@drawable/shape_button_gtxml"
-            android:focusable="false"
-            android:text="+"
-            android:textSize="18sp" />
-    </LinearLayout>
-
-    <CheckBox
-        android:id="@+id/ckselect"
+    <TextView
+        android:id="@+id/txtamount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:padding="3dp"
+        android:paddingBottom="3dp"
+        android:text="x1"
+        android:textColor="#5F5D5D"
+        android:textSize="13sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/txtprice" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -58,13 +58,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:layout_marginBottom="60dp"
-                        android:background="@drawable/img_flower"
+                        android:background="@drawable/img_back"
                         android:minHeight="140dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/img_profit"
@@ -77,6 +78,18 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/img_background"
                         app:layout_constraintVertical_bias="1.0" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="Sửa"
+                        android:textColor="#F3F3F3"
+                        android:textSize="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="1.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </TableRow>
@@ -124,15 +137,15 @@
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
-                <EditText
+                <TextView
                     android:id="@+id/txt_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
-                    android:editable="false"
                     android:ems="10"
+                    android:textColor="#000"
                     android:gravity="right"
                     android:inputType="textPersonName"
                     android:padding="5dp"
@@ -195,7 +208,8 @@
                     android:gravity="right"
                     android:padding="5dp"
                     android:text="19/02/1999"
-                    android:textColor="#000" />
+                    android:textColor="#000"
+                    android:textSize="15sp" />
             </TableRow>
 
             <TableRow
@@ -214,16 +228,13 @@
 
                 <Spinner
                     android:id="@+id/sp_sexs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:background="@android:color/transparent"
-                    android:gravity="right"
-                    android:inputType="textPersonName"
-                    android:padding="5dp"
-                    android:text="Nam"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:inputType="textPersonName"
+                    android:text="Nam"
                     android:textSize="15sp" />
 
             </TableRow>

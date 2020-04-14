@@ -24,13 +24,13 @@ import com.team.mobileworld.core.object.Order;
 import java.text.DecimalFormat;
 import java.util.List;
 
-public class OrderAdapter extends BaseAdapter {
+public class CartAdapter extends BaseAdapter {
     Activity activity;
     List<Order> orderList;
     private int size = 0;
     private Long sum = 0l;
 
-    public OrderAdapter(Activity activity, List<Order> orderList) {
+    public CartAdapter(Activity activity, List<Order> orderList) {
         this.activity = activity;
         this.orderList = orderList;
 
@@ -79,7 +79,7 @@ public class OrderAdapter extends BaseAdapter {
 
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.item_order, null);
+            view = inflater.inflate(R.layout.item_cart, null);
             holder = new ViewHolder(view);
 
             Picasso.get().load(order.getImage()).placeholder(R.drawable.no_image_icon)

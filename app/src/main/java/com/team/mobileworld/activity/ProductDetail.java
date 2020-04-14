@@ -26,6 +26,7 @@ import com.facebook.share.widget.ShareDialog;
 import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
 import com.team.mobileworld.core.handle.APIhandler;
+import com.team.mobileworld.core.handle.FacebookSharing;
 import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.Product;
 import com.team.mobileworld.fragment.InfoLaptopFragment;
@@ -63,7 +64,7 @@ public class ProductDetail extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REPLACE_SIZE)
-            txtSl.setText(APIhandler.getTotalAmount(OrderList));
+            txtSl.setText(APIhandler.getTotalAmount(OrderList) + "");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -89,14 +90,13 @@ public class ProductDetail extends AppCompatActivity {
 
         //Xu ly su kien
         btGioHang.setOnClickListener(e -> {
-            Intent intent = new Intent(this, OrderActivity.class);
+            Intent intent = new Intent(this, CartActivity.class);
             intent.setAction(PRODUCT_OPEN_ORDER);
             startActivityForResult(intent, REPLACE_SIZE);
-            CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
         });
 
         final List<Order> list = MainActivity.OrderList;
-        txtSl.setText(APIhandler.getTotalAmount(OrderList));
+        txtSl.setText(APIhandler.getTotalAmount(OrderList) + "");
 
         //Lay thong tin san pham
         item = (Product) ProductDetail.this.getIntent().getSerializableExtra("thongtin");
@@ -108,7 +108,7 @@ public class ProductDetail extends AppCompatActivity {
         btnOrder.setOnClickListener(e -> {
 
             //Kiểm tra sản phẩm có tồn tại trong giỏ hàng không
-            boolean contain = stream.count() != 0;
+            boolean contain = OrderList.stream().filter(ex -> ex.getId() == item.getId()).count() != 0;
 
             if (contain)
                 new AlertDialog.Builder(ProductDetail.this).setTitle("Mobile Word")
@@ -120,19 +120,15 @@ public class ProductDetail extends AppCompatActivity {
 
         });
 
-        toolbarDetail.setNavigationOnClickListener((e) -> {
-            finish();
-            CustomIntent.customType(this, Animation.RIGHT_TO_LEFT);
-        });
+        toolbarDetail.setNavigationOnClickListener((e) -> finish() );
 
         btnBuy.setOnClickListener(e -> {
             Order order = new Order(item.getId(), item.getName(), Long.valueOf(item.getPrice()), item.getImage()
                     , Integer.valueOf(spSluong.getSelectedItem().toString()));
-            Intent intent = new Intent(this, OrderedActivity.class);
+            Intent intent = new Intent(this, OrderActivity.class);
             intent.putExtra("item", order);
             intent.setAction(BUY_GOODS_NOW);
             startActivity(intent);
-            CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
         });
 
 
@@ -149,27 +145,13 @@ public class ProductDetail extends AppCompatActivity {
             fmanager.beginTransaction().replace(R.id.frag_info_product, flatop).commit();
         }
 
-        btnshare.setOnClickListener(e->shareProductOnFacebook());
+        btnshare.setOnClickListener(e-> FacebookSharing.shareLink(item.getName()  + APIhandler.formatMoney((long) item.getPrice())
+                , "http://google.com", ProductDetail.this));
 
         getInfomation();
         catchEventSpinner();
     }
 
-    public void shareProductOnFacebook() {
-        //Thiet lap 1 dialog hien thi thong tin chia se
-        ShareDialog share = new ShareDialog(this);
-
-        if (share.canShow(ShareLinkContent.class)) {
-            //Thiet lap 1 object chua doi tuong hien thi
-            ShareLinkContent linkContent = new ShareLinkContent.Builder()
-                    .setContentTitle(item.getName())
-                    .setContentDescription(item.getDescription())
-                    .setContentUrl(Uri.parse("api/product/" + item.getId()))
-                    .build();
-            share.show(linkContent);
-        } else
-            Toast.makeText(this, "Sản phẩm chưa được chia sẻ", Toast.LENGTH_SHORT).show();
-    }
 
     //them hang vao gio
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -186,7 +168,7 @@ public class ProductDetail extends AppCompatActivity {
         else
             OrderList.add(order);
 
-        txtSl.setText(APIhandler.getTotalAmount(OrderList));
+        txtSl.setText(APIhandler.getTotalAmount(OrderList) + "");
         Toast.makeText(ProductDetail.this.getBaseContext(), "Đã thêm sản phầm vào giỏ", Toast.LENGTH_SHORT).show();
     }
 
@@ -194,7 +176,7 @@ public class ProductDetail extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menucartorder:
-                Intent intent = new Intent(getApplicationContext(), OrderActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CartActivity.class);
                 startActivity(intent);
                 break;
         }
@@ -227,5 +209,24 @@ public class ProductDetail extends AppCompatActivity {
                 .error(R.drawable.error)
                 .fit().into(imgDetail);
     }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        super.startActivityForResult(intent, requestCode);
+        CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(this, Animation.RIGHT_TO_LEFT);
+    }
+
 
 }

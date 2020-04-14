@@ -1,12 +1,15 @@
 package com.team.mobileworld.adapter;
 
 import android.app.Activity;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -34,6 +37,7 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.It
         return holder;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
         ItemList item = goods.get(position);

@@ -29,6 +29,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
 import com.team.mobileworld.core.handle.APIhandler;
+import com.team.mobileworld.core.handle.ItemTest;
 import com.team.mobileworld.core.object.ItemList;
 import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.User;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final List<Order> OrderList = new ArrayList<>();
     private static final int OPEN_ORDER = 100;
     private static final int OPEN_PRODUCT = 101;
-    static User user;
+    private static User user;
 
     ImageButton btnNav;
     DrawerLayout drawer;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG,  data + "");
+        Log.d(TAG, data + "");
 
         //Cap nhat so luong
         if (requestCode == ProductDetail.REPLACE_SIZE)
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         //Xuat thong tin nguoi dung dang nhap
-        if (requestCode == RQ_OPEN_LOGIN && resultCode == LoginActivity.REQUEST_FBINFOUSER) {
+        if (requestCode == RQ_OPEN_LOGIN && resultCode == LoginActivity.ADD_INFO_USER) {
             user = (User) data.getExtras().getSerializable(LoginActivity.ITEM_USER);
             Log.d(TAG, "AMain: " + user.toString());
 
@@ -111,11 +112,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         //Xu ly su kien
-        btGioHang.setOnClickListener(e -> {
-            Intent intent = new Intent(this, OrderActivity.class);
-            startActivityForResult(intent, ProductDetail.REPLACE_SIZE);
-            CustomIntent.customType(this, Animation.LEFT_TO_RIGHT);
-        });
+        btGioHang.setOnClickListener(e ->
+                startActivityForResult(new Intent(MainActivity.this, CartActivity.class), ProductDetail.REPLACE_SIZE)
+        );
 
         btnNav.setOnClickListener(e -> {
             drawer.openDrawer(GravityCompat.START);
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         fragload = new LoadFragement();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            fragcview = new CustomViewFragement(goods);
+            fragcview = new CustomViewFragement(ItemTest.getItemList());
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -147,12 +146,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getInfoPackage();
     }
 
-    protected void getUserInfo() {
-        User user = (User) getIntent().getExtras().getSerializable(LoginActivity.ITEM_USER);
-        if (user != null) {
-
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -164,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menucartorder:
-                Intent intent = new Intent(getApplicationContext(), OrderActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CartActivity.class);
                 startActivityForResult(intent, OPEN_ORDER);
                 break;
         }
@@ -204,22 +197,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             break;
             case R.id.nav_user: {
-                if(user == null )
-                {
-
+                if (user == null) {
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivityForResult(intent, RQ_OPEN_LOGIN);
                 } else {
-                    Intent intent = new Intent(MainActivity.this, PersonalInfoActivity.class);
+                    Intent intent = new Intent(this, PersonalInfoActivity.class);
                     startActivity(intent);
-                    CustomIntent.customType(this, com.team.mobileworld.activity.Animation.LEFT_TO_RIGHT);
                 }
             }
             break;
             case R.id.nav_logut: {
                 LoginManager.getInstance().logOut();
                 OrderList.clear();
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivityForResult(intent, RQ_OPEN_LOGIN);
-                CustomIntent.customType(this, com.team.mobileworld.activity.Animation.LEFT_TO_RIGHT);
+                startActivityForResult(new Intent(this, LoginActivity.class), RQ_OPEN_LOGIN);
             }
             break;
         }
@@ -227,6 +217,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        CustomIntent.customType(MainActivity.this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        super.startActivityForResult(intent, requestCode);
+        CustomIntent.customType(MainActivity.this, Animation.LEFT_TO_RIGHT);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(this, Animation.RIGHT_TO_LEFT);
+    }
 
     //get key hashs
     private void getInfoPackage() {
@@ -245,4 +252,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+
+    public static User getUser() {
+        return user;
+    }
+
+    public static void setUser(User user) {
+        MainActivity.user = user;
+    }
 }

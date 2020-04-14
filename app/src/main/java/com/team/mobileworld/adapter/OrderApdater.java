@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
@@ -17,11 +18,11 @@ import com.team.mobileworld.core.object.Order;
 import java.text.DecimalFormat;
 import java.util.List;
 
-public class OrderedApdater extends RecyclerView.Adapter<OrderedApdater.ItemHolder> {
+public class OrderApdater extends RecyclerView.Adapter<OrderApdater.ItemHolder> {
     private Activity activity;
     private List<Order> list;
 
-    public OrderedApdater(Activity activity, List<Order> list) {
+    public OrderApdater(Activity activity, List<Order> list) {
         this.activity = activity;
         this.list = list;
     }
@@ -29,7 +30,7 @@ public class OrderedApdater extends RecyclerView.Adapter<OrderedApdater.ItemHold
     @NonNull
     @Override
     public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(activity).inflate(R.layout.item_ordered, null);
+        View view = LayoutInflater.from(activity).inflate(R.layout.item_order, null);
         ItemHolder holder = new ItemHolder(view);
         return holder;
     }
@@ -42,6 +43,7 @@ public class OrderedApdater extends RecyclerView.Adapter<OrderedApdater.ItemHold
                 .fit().centerCrop()
                 .error(R.drawable.error)
                 .into(holder.imgSanpham);
+
 
         holder.txtSanpham.setText(item.getName());
         holder.txtSluong.setText("x" + item.getAmount() + "");
@@ -60,10 +62,10 @@ public class OrderedApdater extends RecyclerView.Adapter<OrderedApdater.ItemHold
 
         public ItemHolder(@NonNull View view) {
             super(view);
-            txtSanpham = view.findViewById(R.id.txtSpham);
-            txtPloai = view.findViewById(R.id.txtPLoai);
-            txtSluong = view.findViewById(R.id.txtSLuong);
-            txtDgia = view.findViewById(R.id.txtDgia);
+            txtSanpham = view.findViewById(R.id.txtproductname);
+            txtPloai = view.findViewById(R.id.txttype);
+            txtSluong = view.findViewById(R.id.txtamount);
+            txtDgia = view.findViewById(R.id.txtprice);
             imgSanpham = view.findViewById(R.id.imgSpham);
         }
     }

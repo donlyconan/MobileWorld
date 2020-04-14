@@ -13,7 +13,6 @@ import com.team.mobileworld.R;
 
 public class LoadFragement extends Fragment {
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

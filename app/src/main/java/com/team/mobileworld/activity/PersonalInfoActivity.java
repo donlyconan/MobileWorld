@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,9 +36,10 @@ public class PersonalInfoActivity extends AppCompatActivity {
 
     private static final int READ_RQ_IMAGE = 150;
     private static final int READ_RQ_BIMAGE = 151;
-    EditText txtfullname, txtusername, txtpassword;
+    EditText txtfullname, txtpassword;
     EditText txtdofbirth, txtaddress, txtphonenumber, txtemail;
     Spinner spsexs;
+    TextView txtusername;
     CircleImageView imgprofit;
     ImageView imgbground;
     final Intent intent = new Intent();
@@ -46,26 +48,27 @@ public class PersonalInfoActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case READ_RQ_IMAGE: {
-                try {
+        if (data == null || data.getData() == null)
+            return;
+
+        try {
+            switch (requestCode) {
+                case READ_RQ_IMAGE: {
                     Uri uri = data.getData();
                     imgprofit.setImageBitmap(getBitmapFromUri(uri));
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            } break;
+                break;
 
-            case READ_RQ_BIMAGE:{
-                try {
+                case READ_RQ_BIMAGE: {
                     Uri uri = data.getData();
                     imgbground.setImageBitmap(getBitmapFromUri(uri));
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-
-            } break;
+                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -90,8 +93,9 @@ public class PersonalInfoActivity extends AppCompatActivity {
 
         //Cai dat spiner
         final String[] sexs = new String[]{"Nam", "Nữ", "Không xác định"};
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, sexs);
+        ArrayAdapter arrayAdapter = new ArrayAdapter(this,R.layout.spinner_custom, sexs);
         spsexs.setAdapter(arrayAdapter);
+        spsexs.setSelection(0);
 
         //Xu ly su kien
         toolbar.setNavigationOnClickListener(e -> {
@@ -107,9 +111,9 @@ public class PersonalInfoActivity extends AppCompatActivity {
             CustomIntent.customType(PersonalInfoActivity.this, Animation.RIGHT_TO_LEFT);
         });
 
-        imgprofit.setOnClickListener(e->openReplaceImage(READ_RQ_IMAGE));
+        imgprofit.setOnClickListener(e -> openReplaceImage(READ_RQ_IMAGE));
 
-        imgbground.setOnClickListener(e->openReplaceImage(READ_RQ_BIMAGE));
+        imgbground.setOnClickListener(e -> openReplaceImage(READ_RQ_BIMAGE));
 
         showInfo();
     }
@@ -123,7 +127,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         return image;
     }
 
-    public void openReplaceImage(final  int mode) {
+    public void openReplaceImage(final int mode) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -134,16 +138,23 @@ public class PersonalInfoActivity extends AppCompatActivity {
     }
 
     private void showInfo() {
-        User user = MainActivity.user;
 
-        Picasso.get().load(user.getProfit()).error(R.drawable.ic_profit)
-                .fit().into(imgprofit);
-//        txtfullname.setText(user.getFullname());
-//        txtusername.setText(user.getAcc().getUsername());
-//        txtaddress.setText(user.getAddress());
-//        txtdofbirth.setText(user.getBdate());
-//        txtemail.setText(txtemail.getText());
-//        txtphonenumber.setText(txtphonenumber.getText());
+        User user = MainActivity.getUser();
+
+        if(user != null)
+        {
+            Picasso.get().load(user.getProfit()).error(R.drawable.ic_profit)
+                    .fit().into(imgprofit);
+            txtfullname.setText(get(user.getFullname()));
+            txtaddress.setText(get(user.getAddress()));
+            txtdofbirth.setText(get(user.getBdate()));
+            txtemail.setText(get(user.getEmail()));
+            txtphonenumber.setText(get(user.getPnumber()));
+        }
+    }
+
+    public static String get(String text) {
+        return text == null ? "" : text;
     }
 
     @Override
