@@ -9,12 +9,12 @@ import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,15 +22,23 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
+import com.team.mobileworld.core.NetworkCommon;
+import com.team.mobileworld.core.handle.APIhandler;
 import com.team.mobileworld.core.object.User;
+import com.team.mobileworld.core.service.UserService;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import maes.tech.intentanim.CustomIntent;
+import okhttp3.Address;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 
 public class PersonalInfoActivity extends AppCompatActivity {
 
@@ -165,6 +173,34 @@ public class PersonalInfoActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        String fullname = txtfullname.getText().toString();
+        String std = txtphonenumber.getText().toString();
+        String email = txtemail.getText().toString();
+        int gender = spsexs.getSelectedItemPosition();
+        String address = txtaddress.getText().toString();
+
+        User user = MainActivity.getUser();
+        user.setFullname(fullname);
+        user.setAddress(address);
+        user.setEmail(email);
+        user.setGender(gender);
+        user.setPnumber(std);
+
+        UserService service = NetworkCommon.getRetrofit().create(UserService.class);
+
+        Call<ResponseBody> call = service.updatePersonalInfo(user);
+
+        try {
+            JsonObject json = APIhandler.convertToJSon(call.execute().body().string());
+            if(json.has(MainActivity.MESSAGE)){
+                Toast.makeText(this.getBaseContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+            }
+            if(json.has(MainActivity.ERROR))
+                Toast.makeText(this.getBaseContext(), "Cập nhật không thành công: lỗi " + json.get(MainActivity.ERROR), Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return super.onOptionsItemSelected(item);
     }

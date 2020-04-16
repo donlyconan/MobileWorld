@@ -1,11 +1,11 @@
-package com.team.mobileworld.ultil;
+package com.team.mobileworld.core.handle;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
-public class CheckWifiValid {
+public class ValidNetwork {
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -13,24 +13,24 @@ public class CheckWifiValid {
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
-    public static boolean haveNetworkConnection(Context context) {
-        boolean haveConnectedWifi = false;
-        boolean haveConnectedMobile = false;
+    public static boolean hasNetwork(Context context) {
+        boolean hasWifi = false;
+        boolean hasInternet = false;
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo[] netInfo = cm.getAllNetworkInfo();
         for (NetworkInfo ni : netInfo) {
             if (ni.getTypeName().equalsIgnoreCase("WIFI"))
                 if (ni.isConnected())
-                    haveConnectedWifi = true;
+                    hasWifi = true;
             if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
                 if (ni.isConnected())
-                    haveConnectedMobile = true;
+                    hasInternet = true;
         }
-        return haveConnectedWifi || haveConnectedMobile;
+        return hasWifi || hasInternet;
     }
 
-    public static void ShowToast_Short(Context context, String message){
+    public static void show(Context context, String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }

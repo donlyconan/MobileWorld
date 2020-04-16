@@ -3,6 +3,7 @@ package com.team.mobileworld.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,10 +45,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
     public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_productnewest, null);
         ItemHolder holder = new ItemHolder(v);
-
-        ImageView img = v.findViewById(R.id.imgproduct);
-        img.getLayoutParams().height = parent.getMeasuredWidth()/2 - 5;
-        img.getLayoutParams().width = parent.getMeasuredWidth()/2-5;
+        Log.d("productinfo", parent.getMeasuredHeight() + " : +" + parent.getMeasuredWidth());
         return holder;
     }
 

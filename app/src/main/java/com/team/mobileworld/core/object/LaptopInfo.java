@@ -22,8 +22,6 @@ public class LaptopInfo extends ProductInfo {
 	
 	@SerializedName("relese")
 	private String relese;
-	
-	
 
 	public LaptopInfo(String cpu, String ram, String screen, String os, String cardscreen, String connector,
 			String harddrive, String design, String size, String relese) {

@@ -1,20 +1,21 @@
 package com.team.mobileworld.core.object;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
-public class SmartphoneInfo {
+public class SmartphoneInfo extends ProductInfo {
 	
-	@SerializedName("cpu")
-	private String cpu;
-
-	@SerializedName("ram")
-	private String ram;
-
-	@SerializedName("screen")
-	private String screen;
-
-	@SerializedName("os")
-	private String os;
+//	@SerializedName("cpu")
+//	private String cpu;
+//
+//	@SerializedName("ram")
+//	private String ram;
+//
+//	@SerializedName("screen")
+//	private String screen;
+//
+//	@SerializedName("os")
+//	private String os;
 	
 	@SerializedName("backcamera")
 	private String backcamera;
@@ -38,10 +39,11 @@ public class SmartphoneInfo {
 
 	public SmartphoneInfo(String cpu, String ram, String screen, String os, String backcamera, String frontcamera,
 			String internalmemmory, String memorystick, String sim, String batery) {
-		this.cpu = cpu;
-		this.ram = ram;
-		this.screen = screen;
-		this.os = os;
+//		this.cpu = cpu;
+//		this.ram = ram;
+//		this.screen = screen;
+//		this.os = os;
+		super(cpu,ram,screen,os);
 		this.backcamera = backcamera;
 		this.frontcamera = frontcamera;
 		this.internalmemmory = internalmemmory;
@@ -50,8 +52,6 @@ public class SmartphoneInfo {
 		this.batery = batery;
 	}
 
-
-	
 
 	@Override
 	public String toString() {
@@ -106,9 +106,15 @@ public class SmartphoneInfo {
 	public void setBatery(String batery) {
 		this.batery = batery;
 	}
-	
-	
-	
 
 
+	@Override
+	public void toJson(ProductInfo info) {
+
+	}
+
+	@Override
+	public JsonObject getObject(JsonObject json) {
+		return null;
+	}
 }

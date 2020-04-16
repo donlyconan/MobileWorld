@@ -11,6 +11,8 @@
     <string name="login_failed">"Login failed"</string>
     <string name="facebook_app_id">239186267278436</string>
     <string name="fb_login_protocol_scheme">fb239186267278436</string>
+    <string name="username">Tên đăng nhập</string>
+    <string name="take">message</string>
 
 
 </resources>

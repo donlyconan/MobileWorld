@@ -116,7 +116,7 @@ public class CartAdapter extends BaseAdapter {
 
             txtMoney.setText(APIhandler.getFormatTotalMoneySelected(orderList));
 
-            if (order.getAmount() > 9)
+            if (order.getAmount() > order.getSlmax())
                 holder.btnPlus.setEnabled(false);
         });
 

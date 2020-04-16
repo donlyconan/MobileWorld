@@ -43,11 +43,11 @@ public class ItemTest {
         {
             final List<Product> products = new ArrayList<>();
 
-            for (int j = 0; j <= rd.nextInt(10) + 8; j++)
+            for (int j = 0; j <= 19; j++)
             {
                 String name = names.get(rd.nextInt(names.size()));
                 String url = urls.get(rd.nextInt(urls.size()));
-                Product product = getProduct(rd, name, url);
+                Product product = getProduct(i * 20 + j + 100000, rd, name, url);
                 products.add(product);
             }
             ItemList itemList = new ItemList(title[i].toUpperCase(), products, i);
@@ -58,9 +58,9 @@ public class ItemTest {
         return lists;
     }
 
-    public static Product getProduct(Random rd, String name, String url)
+    public static Product getProduct(int id,Random rd, String name, String url)
     {
-        Product product = new Product(rd.nextInt(1000000), name
+        Product product = new Product(id, name
         , (int) (rd.nextLong() + 5000000), url, "No decription", rd.nextInt(2), rd.nextInt(100) + 10);
         return product;
     }

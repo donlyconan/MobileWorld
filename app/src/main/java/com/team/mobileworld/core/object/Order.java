@@ -18,7 +18,7 @@ public class Order implements Serializable {
     private String name;
 
     @SerializedName("price") @Expose
-    private Long price;
+    private int price;
 
     @SerializedName("image") @Expose
     private String image;
@@ -28,18 +28,24 @@ public class Order implements Serializable {
 
     @SerializedName("status") @Expose
     private int status = 0;
-    
+
+    private int slmax = 0;
+
     private boolean select = true;
 
-    public Order(int id, String name, Long price, String image, int amount) {
+    public Order(int id, String name, int price, String image, int amount) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.image = image;
         this.amount = amount;
     }
-    
-    
+
+    public Order(int id, String name, int price, String image, int amount, int slmax) {
+        this(id,name,price,image,amount);
+        this.slmax = slmax;
+    }
+
 
     @Override
 	public String toString() {
@@ -47,11 +53,33 @@ public class Order implements Serializable {
 				+ ", select=" + select + "]";
 	}
 
+	public static Order convertToOrder(Product product){
+        return  new Order(product.getId(), product.getName()
+                ,product.getPrice(),product.getImage()
+                ,0,product.getSlmax());
+    }
+
 
 
 	//Lay tong so tien cua san pham
     public long getTotalMoney() {
         return price * amount;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getSlmax() {
+        return slmax;
+    }
+
+    public void setSlmax(int slmax) {
+        this.slmax = slmax;
     }
 
     public int getId() {
@@ -70,11 +98,11 @@ public class Order implements Serializable {
         this.name = name;
     }
 
-    public Long getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(Long price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 

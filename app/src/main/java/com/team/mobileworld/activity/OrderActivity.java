@@ -30,8 +30,7 @@ import java.util.List;
 import maes.tech.intentanim.CustomIntent;
 
 public class OrderActivity extends AppCompatActivity {
-    public static final List<Order> ORDER_LIST = MainActivity.OrderList;
-    public static final String AC_OPEN_EDIT_ADD = "AC_OPEN_EDIT_ADD";
+    public static final String Inte = "AC_OPEN_EDIT_ADD";
     private static final int REQUEST_PERSON = 10;
 
     OrderApdater apdater;
@@ -40,12 +39,15 @@ public class OrderActivity extends AppCompatActivity {
     TextView txtTStien, txtTSpham, txtTTien, txtname, txtinfo;
     EditText txtaddress;
     Button btnDhang;
+    ImageButton btnedit;
+    Toolbar toolbar;
+    List<Order> cart;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_PERSON && resultCode == 10) {
+        if (requestCode == REQUEST_PERSON && resultCode == REQUEST_PERSON) {
             String address = data.getExtras().getString("address");
             txtaddress.setText(address);
         }
@@ -58,22 +60,53 @@ public class OrderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order);
 
         //Anh xa phan tu
-        txtTSpham = findViewById(R.id.txtTSpham);
-        txtTStien = findViewById(R.id.txtTStien);
-        txtTTien = findViewById(R.id.txtTTien);
-        txtaddress = findViewById(R.id.txtaddress);
-        txtname = findViewById(R.id.txtname);
-        final Toolbar toolbar = findViewById(R.id.toolbar);
-        recycler = findViewById(R.id.recycle_view);
-        btnDhang = findViewById(R.id.btnbuy);
-        txtinfo = findViewById(R.id.txtinfoname);
-        final ImageButton btnedit = findViewById(R.id.btnedit);
+        elementMapping();
 
         //Cai dat hien thi
+        init();
+
+        btnDhang.setOnClickListener(e -> onActionOrder());
+
+        btnedit.setOnClickListener(e -> startPersonalInfo());
+
+        //Xu ly su kien
+        toolbar.setNavigationOnClickListener(e -> finish());
+    }
+
+    private void startPersonalInfo() {
+        Intent intent = new Intent(OrderActivity.this, PersonalInfoActivity.class);
+        intent.setAction(Intent.ACTION_EDIT);
+        startActivityForResult(intent, REQUEST_PERSON);
+    }
+
+    private void onActionOrder() {
+        User user = MainActivity.getUser();
+
+        //Kiem tra so dien thoai nguoi nhan
+        if (MainActivity.validUser() == MainActivity.STATUS_LOGIN_NOT_PHONE) {
+            Intent intent = new Intent(OrderActivity.this, PersonalInfoActivity.class);
+            intent.setAction(Intent.ACTION_EDIT);
+            startActivityForResult(intent, REQUEST_PERSON);
+        } else
+            //Kiem tra gio hang
+            if (list.size() <= 0) {
+                Toast.makeText(OrderActivity.this, "Vui lòng chọn mua sản phẩm trước khi đặt hàng.", Toast.LENGTH_SHORT).show();
+            } else {
+                cart.removeAll(list);
+                Toast.makeText(OrderActivity.this, "Đặt hàng thàng công", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void init() {
         recycler.setHasFixedSize(true);
         recycler.setLayoutManager(new GridLayoutManager(this, 1));
+        getDataFromIntent();
 
         final User user = MainActivity.getUser();
+        cart = MainActivity.getCart();
 
         if (user != null) {
             txtinfo.setText(PersonalInfoActivity.get(user.getFullname()) + " | " + PersonalInfoActivity.get(user.getPnumber()));
@@ -83,41 +116,24 @@ public class OrderActivity extends AppCompatActivity {
             txtaddress.setFocusable(true);
             txtaddress.requestFocus();
         }
-
-        btnDhang.setOnClickListener(e -> {
-
-            //Kiem tra so dien thoai nguoi nhan
-            if (user == null || user.getToken() == null || user.getPnumber() == null || user.getPnumber().length() == 0) {
-                Intent intent = new Intent(OrderActivity.this, PersonalInfoActivity.class);
-                intent.setAction(AC_OPEN_EDIT_ADD);
-                startActivityForResult(intent, REQUEST_PERSON);
-            } else
-                //Kiem tra gio hang
-                if (list.size() <= 0) {
-                    Toast.makeText(OrderActivity.this, "Vui lòng chọn mua sản phẩm trước khi đặt hàng.", Toast.LENGTH_SHORT).show();
-                } else {
-                    ORDER_LIST.removeAll(list);
-                    Toast.makeText(OrderActivity.this, "Đặt hàng thàng công", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-        });
-
-        btnedit.setOnClickListener(e -> {
-            Intent intent = new Intent(OrderActivity.this, PersonalInfoActivity.class);
-            intent.setAction(Intent.ACTION_EDIT);
-            startActivityForResult(intent, REQUEST_PERSON);
-        });
-
-        getDataFromIntent();
-        //Xu ly su kien
-        toolbar.setNavigationOnClickListener(e -> finish());
-
-
         //cai dat thuoc tinh
         txtTSpham.setText("Tổng số (" + APIhandler.getTotalAmount(list) + " sản phầm):");
         String ThanhTien = APIhandler.formatMoney(APIhandler.getTotalMoney(list));
         txtTStien.setText(ThanhTien);
         txtTTien.setText(ThanhTien);
+    }
+
+    private void elementMapping() {
+        txtTSpham = findViewById(R.id.txtTSpham);
+        txtTStien = findViewById(R.id.txtTStien);
+        txtTTien = findViewById(R.id.txtTTien);
+        txtaddress = findViewById(R.id.txtaddress);
+        txtname = findViewById(R.id.txtname);
+        toolbar = findViewById(R.id.toolbar);
+        recycler = findViewById(R.id.recycle_view);
+        btnDhang = findViewById(R.id.btnbuy);
+        txtinfo = findViewById(R.id.txtinfoname);
+        btnedit = findViewById(R.id.btnedit);
     }
 
 
@@ -127,13 +143,12 @@ public class OrderActivity extends AppCompatActivity {
             list = new ArrayList<>();
             list.add((Order) getIntent().getExtras().get("item"));
         } else {
-            list = APIhandler.getProductSeleted(ORDER_LIST);
+            list = APIhandler.getProductSeleted(cart);
         }
         apdater = new OrderApdater(this, list);
         Log.d("SIZE", list.size() + "");
         recycler.setAdapter(apdater);
     }
-
 
     @Override
     public void startActivity(Intent intent) {

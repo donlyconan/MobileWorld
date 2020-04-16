@@ -9,8 +9,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkCommon {
-    public static final int READ_TIME_OUT = 6000;
-    public static final int CONNECT_TIME_OUT = 5000;
+    public static final int READ_TIME_OUT = 10000;
+    public static final int CONNECT_TIME_OUT = 8000;
 
     //URL co ban
     public static final String BASE_URL = "http://localhost:8080/";
@@ -28,9 +28,7 @@ public class NetworkCommon {
     		//Thiết lập Interceptor
     		HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
     		interceptor.setLevel(Level.BODY);
-    	
-    		
-    		
+
     		//Thiet lap OkHttp
     		okhttp = new OkHttpClient.Builder()
     				.addInterceptor(interceptor)

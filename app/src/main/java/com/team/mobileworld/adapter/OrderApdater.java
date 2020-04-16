@@ -70,4 +70,11 @@ public class OrderApdater extends RecyclerView.Adapter<OrderApdater.ItemHolder> 
         }
     }
 
+    public List<Order> getList() {
+        return list;
+    }
+
+    public void setList(List<Order> list) {
+        this.list = list;
+    }
 }

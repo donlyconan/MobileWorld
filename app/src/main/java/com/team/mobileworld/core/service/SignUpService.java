@@ -9,9 +9,8 @@ import retrofit2.http.POST;
 public interface SignUpService {
 	
 	
-	public static final String URL_REGISTER = "api/login/signup";
+	public static final String URL_REGISTER = "api/login/register/";
 
-	
 
 	/**
 	 * Giử thông tin về tài khoản mật khẩu lên server 

@@ -1,15 +1,15 @@
 package com.team.mobileworld.core.object;
 
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private Account acc;
 
     @SerializedName("id")
-    private String id;
+    private long id = 0;
 
     @SerializedName("fullname")
     @Expose
@@ -43,11 +43,13 @@ public class User implements Serializable {
     @Expose
     private int gender = 0;
 
-    private String token = null;
 
-    public User(Account acc, String id, String fullname, String email, String profit, String bground,
+    public User(long id) {
+        this.id = id;
+    }
+
+    public User(Long id, String fullname, String email, String profit, String bground,
                 String bdate, int gender, String address, String pnumber) {
-        this.acc = acc;
         this.id = id;
         this.fullname = fullname;
         this.profit = profit;
@@ -66,17 +68,10 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "User [acc=" + acc + ", id=" + id + ", fullname=" + fullname + ", profit=" + profit + ", email=" + email
+        return "User [id=" + id + ", fullname=" + fullname + ", profit=" + profit + ", email=" + email
                 + ", bground=" + bground + ", bdate=" + bdate + ", address=" + address + ", pnumber=" + pnumber + "]";
     }
 
-    public Account getAcc() {
-        return acc;
-    }
-
-    public void setAcc(Account acc) {
-        this.acc = acc;
-    }
 
     public String getFullname() {
         return fullname;
@@ -130,12 +125,20 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
     }
 
     public String getEmail() {
@@ -146,16 +149,5 @@ public class User implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-
-
-    public String getToken() {
-        return token;
-    }
-
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
 
 }

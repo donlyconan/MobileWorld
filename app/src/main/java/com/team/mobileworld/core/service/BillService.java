@@ -6,9 +6,10 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public interface BillService {
-	public static final String URL_BILL = "api/user/purchase/";
+	public static final String URL_BILL = "api/user/purchase/bill?";
 	
 	/**
 	 * Giử cho khách hàng tất cả thông tin về các sản phầm đã đặt hàng trước đó
@@ -20,7 +21,7 @@ public interface BillService {
 	 * @return
 	 */
 	@GET(URL_BILL)
-	Call<List<Order>> loadBill();
+	Call<List<Order>> loadBill(@Query("id") long id);
 	
 	
 }

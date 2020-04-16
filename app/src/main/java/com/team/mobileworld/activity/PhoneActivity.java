@@ -40,7 +40,7 @@ public class PhoneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone);
         anhxa();
-//        if (CheckWifiValid.haveNetworkConnection(getApplicationContext())) {
+//        if (ValidNetwork.haveNetworkConnection(getApplicationContext())) {
             getCategoryId();
             actionToolBar();
 //            getData(page);
@@ -114,14 +114,14 @@ public class PhoneActivity extends AppCompatActivity {
 //                        } else {
 //                            limitData = true;
 //                            listView.removeFooterView(footerView);
-//                            CheckWifiValid.ShowToast_Short(getApplicationContext(), "Hết dữ liệu rồi");
+//                            ValidNetwork.ShowToast_Short(getApplicationContext(), "Hết dữ liệu rồi");
 //                        }
 //                    }
 //                },
 //                new Response.ErrorListener() {
 //                    @Override
 //                    public void onErrorResponse(VolleyError error) {
-//                        CheckWifiValid.ShowToast_Short(getApplicationContext(), "404 Not Found");
+//                        ValidNetwork.ShowToast_Short(getApplicationContext(), "404 Not Found");
 //                    }
 //                });
 //        requestQueue.add(stringRequest);

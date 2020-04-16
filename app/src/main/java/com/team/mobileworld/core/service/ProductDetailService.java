@@ -3,6 +3,7 @@ package com.team.mobileworld.core.service;
 import com.team.mobileworld.core.object.Product;
 import com.team.mobileworld.core.object.ProductInfo;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -15,19 +16,19 @@ public interface ProductDetailService {
 
 	
 	/**
-	 * Giử đi: id của sản phẩm
-	 * Nhận về: Thông tin về sản phẩm
+	 * Giử đi: 1 đường dẫn chứa id của sản phẩm
+	 * Nhận về: Thông tin về sản phẩm dưới dạng object
 	 */
 	@GET(URL_PRODUCT_INFO)
 	Call<Product> getProductDetail(@Path(value = "id") int id);
 	
 	
 	/**
-	 * Giử đi: Mã ID của sản phẩm yêu cầu
+	 * Giử đi: Mã ID của sản phẩm yêu cầu trả về thông tn kỹ thuật của sản phẩm
 	 * Nhận về: Một đối tượng ProductInfo chứa thông tin kỹ thuật của sản phẩm
 	 * object: ProductInfo
 	 */
 	@GET(URL_TECHNICAL_INFO)
-	Call<ProductInfo> getTechnicalData(@Path("id") int id);
+	Call<ResponseBody> getTechnicalData(@Path("id") int id);
 	
 }

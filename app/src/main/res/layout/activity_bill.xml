@@ -10,6 +10,7 @@
     <include layout="@layout/toolbar_result_search"/>
 
     <TextView
+        android:id="@+id/search_bar"
         android:text="Danh sách hàng hóa"
         android:layout_width="match_parent"
         android:layout_marginTop="10dp"
@@ -22,7 +23,7 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycle_vc"
+        android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"

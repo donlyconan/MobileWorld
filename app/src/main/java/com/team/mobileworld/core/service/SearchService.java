@@ -22,28 +22,29 @@ public interface SearchService {
 	
 	/**
 	 * Giử đi:
-	 * 		Giử thông tin sản phầm đã qua xử lý
+	 * 		Giử thông tin sản phầm đã qua xử lý ở dạng văn bản
 	 * Xử lý-Nhận:
-	 * 		Server trả về List dãy các sản phẩm 
-			đối tượng Product
-	 * 		
+	 * 		Server trả về List là dãy các sản phẩm
+			đối tượng Product đối tượng mà khách hàng đang tìm kiếm
+	 *
+	 * 	từ khóa: keyword: "text"
 	 * @param map
 	 * @return
 	 */
 	@POST(URL_GET_RESULT_SEARCH)
-	Call<List<Product>> search(@QueryMap Map<String, String> map);
+	Call<List<Product>> search(@QueryMap Map<String, String> params);
 	
 	
 	
 	/**
-	 * RQ: Giử lên từ khóa của sản phẩm kết
+	 * RQ: Giử lên từ khóa hoặc id của sản phẩm kết
 	 * RP: nhận về một dãy các sản phẩm có từ khóa tương tự
 	 * 
-	 * @param text
+	 * @param keyword
 	 * @return
 	 */
 	@FormUrlEncoded
 	@POST(URL_GET_SUGGEST_QUERY)
-	Call<ResponseBody> suggestQuery(@Field("text") String text);
+	Call<ResponseBody> suggestQuery(@Field("text") String keyword);
 	
 }

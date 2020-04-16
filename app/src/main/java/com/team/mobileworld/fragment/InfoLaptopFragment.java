@@ -10,9 +10,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.team.mobileworld.R;
+import com.team.mobileworld.core.object.LaptopInfo;
 
 public class InfoLaptopFragment extends Fragment {
 
+    private LaptopInfo info;
+
+    public InfoLaptopFragment(LaptopInfo info) {
+        this.info = info;
+    }
 
     @Nullable
     @Override
