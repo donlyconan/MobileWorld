@@ -16,19 +16,28 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
-import com.team.mobileworld.core.handle.APIhandler;
+import com.team.mobileworld.activity.MainActivity;
+import com.team.mobileworld.core.NetworkCommon;
+import com.team.mobileworld.core.database.Database;
+import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.object.Order;
+import com.team.mobileworld.core.service.BasketService;
 
 import java.text.DecimalFormat;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CartAdapter extends BaseAdapter {
     Activity activity;
     List<Order> orderList;
     private int size = 0;
     private Long sum = 0l;
+    private Call<ResponseBody> call;
 
     public CartAdapter(Activity activity, List<Order> orderList) {
         this.activity = activity;
@@ -81,14 +90,17 @@ public class CartAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.item_cart, null);
             holder = new ViewHolder(view);
-
-            Picasso.get().load(order.getImage()).placeholder(R.drawable.no_image_icon)
-                    .fit().centerCrop()
-                    .error(R.drawable.error).into(holder.imgOrder);
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
         }
+
+        Handler.loadImage(activity, order.getImage(), holder.imgOrder);
+
+//        Picasso.get().load(order.getImage()).placeholder(R.drawable.no_image_icon)
+//                .fit().centerCrop()
+//                .error(R.drawable.error).into(holder.imgOrder);
+
         final TextView txtMoney = activity.findViewById(R.id.txtThanhTien);
         CheckBox ckSelALL = activity.findViewById(R.id.ckSelAll);
 
@@ -97,7 +109,7 @@ public class CartAdapter extends BaseAdapter {
         holder.txtValue.setText(order.getAmount() + "");
         holder.ckSel.setChecked(order.isSelect());
 
-        holder.ckSel.setOnCheckedChangeListener((b, e) ->{
+        holder.ckSel.setOnCheckedChangeListener((b, e) -> {
             orderList.get(position).setSelect(e);
 
             //Đếm tất cả sản phẩm đc chọn
@@ -105,36 +117,59 @@ public class CartAdapter extends BaseAdapter {
 
             //Cài đặt
             ckSelALL.setChecked((count == orderList.size()));
-            txtMoney.setText(APIhandler.getFormatTotalMoneySelected(orderList));
-        } );
+            txtMoney.setText(Handler.getFormatTotalMoneySelected(orderList));
+        });
 
         holder.btnPlus.setOnClickListener(e -> {
             holder.btnMinus.setEnabled(true);
             order.setAmount(order.getAmount() + 1);
+            update((int) MainActivity.getUser().getId(), order.getId(), +1);
             holder.txtValue.setText(order.getAmount() + "");
             holder.txtPriceOrder.setText(formatMoney(order.getTotalMoney()));
 
-            txtMoney.setText(APIhandler.getFormatTotalMoneySelected(orderList));
+            txtMoney.setText(Handler.getFormatTotalMoneySelected(orderList));
 
             if (order.getAmount() > order.getSlmax())
                 holder.btnPlus.setEnabled(false);
         });
 
         holder.btnMinus.setOnClickListener(e -> {
+            if (order.getAmount() <= 1)
+                return;
             holder.btnPlus.setEnabled(true);
             order.setAmount(order.getAmount() - 1);
             holder.txtValue.setText(order.getAmount() + "");
+            update((int) MainActivity.getUser().getId(), order.getId(), -1);
             holder.txtPriceOrder.setText(formatMoney(order.getTotalMoney()));
-            txtMoney.setText(APIhandler.getFormatTotalMoneySelected(orderList));
+            txtMoney.setText(Handler.getFormatTotalMoneySelected(orderList));
 
             if (order.getAmount() < 2)
                 holder.btnMinus.setEnabled(false);
-
         });
         return view;
     }
 
-    public static String formatMoney(long money){
+    public void update(int userid, int catalogid, final int amount) {
+        if (MainActivity.getUser().isLogin()) {
+            call = NetworkCommon.getRetrofit().create(BasketService.class)
+                    .addOrder(userid, catalogid, amount);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                }
+            });
+        } else {
+            Database db = MainActivity.getDatabaseInstence();
+            db.updateUnit(catalogid, amount);
+        }
+    }
+
+
+    public static String formatMoney(long money) {
         final DecimalFormat format = new DecimalFormat("###,###,###");
         return format.format(money) + " đ";
     }
@@ -155,5 +190,24 @@ public class CartAdapter extends BaseAdapter {
         return sum;
     }
 
+    public void setOrderList(List<Order> orderList) {
+        this.orderList = orderList;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public void setSum(Long sum) {
+        this.sum = sum;
+    }
+
+    public Call<ResponseBody> getCall() {
+        return call;
+    }
+
+    public void setCall(Call<ResponseBody> call) {
+        this.call = call;
+    }
 }
 

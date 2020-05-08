@@ -13,6 +13,7 @@ public class ValidNetwork {
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
+
     public static boolean hasNetwork(Context context) {
         boolean hasWifi = false;
         boolean hasInternet = false;
@@ -30,7 +31,7 @@ public class ValidNetwork {
         return hasWifi || hasInternet;
     }
 
-    public static void show(Context context, String message){
+    public static void showToast(Context context, String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }

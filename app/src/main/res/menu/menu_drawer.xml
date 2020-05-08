@@ -18,21 +18,21 @@
             android:title="Laptop" />
     </group>
 
-    <item
-        android:title="Liên kết">
+    <item android:title="Thông báo">
         <menu>
             <item
-                android:id="@+id/nav_fb"
-                android:icon="@drawable/img_facebook"
-                android:title="Facebook" />
+                android:id="@+id/nav_noti"
+                android:icon="@drawable/ic_notifications"
+                android:title="Thông báo" />
         </menu>
     </item>
 
     <item android:title="Tài khoản">
         <menu>
-            <item android:id="@+id/nav_bill"
+            <item
+                android:id="@+id/nav_bill"
                 android:icon="@drawable/ic_bill"
-                android:title="Đặt mua"/>
+                android:title="Đặt mua" />
             <item
                 android:id="@+id/nav_user"
                 android:icon="@drawable/img_user"
@@ -41,6 +41,15 @@
                 android:id="@+id/nav_logut"
                 android:icon="@drawable/img_logout"
                 android:title="Đăng xuất" />
+        </menu>
+    </item>
+
+    <item android:title="Ứng dụng">
+        <menu>
+            <item
+                android:id="@+id/nav_feedback"
+                android:icon="@drawable/ic_feedback"
+                android:title="Phản hồi" />
         </menu>
     </item>
 

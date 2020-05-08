@@ -1,4 +1,4 @@
-package com.team.mobileworld.database;
+package com.team.mobileworld.core.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,6 +25,7 @@ public class Database extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "MOBILE_WORLD";
     public static final String TABLE_CART = "Cart";
     public static final String TABLE_ACCOUNT = "Account";
+    public static final int DEL_ALL = -1;
 
 
     public Database(@Nullable Context context, int version) {
@@ -75,50 +76,69 @@ public class Database extends SQLiteOpenHelper {
 
     public Account getAccount() {
         Account account = null;
-        String sql = "select username,password from " + TABLE_ACCOUNT + " ORDER BY time DESC";
         SQLiteDatabase db = this.getReadableDatabase();
+
+        String sql = "select username,password,time from " + TABLE_ACCOUNT + " ORDER BY time DESC";
         Cursor cur = db.rawQuery(sql, null);
-        if (cur != null && cur.getCount() > 0)
+
+        if (cur != null && cur.getCount() > 0) {
+            cur.moveToNext();
             account = new Account(cur.getString(0), cur.getString(1));
-        
-        print("get Account=" + cur.getCount());
+        }
+
+        print("Lay thong tin tai khoan: " + account);
         db.close();
         return account;
     }
 
-    public void clearAccount(){
-        getWritableDatabase().execSQL("delete from "+ TABLE_ACCOUNT);
+    public void clearAccount() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("delete from " + TABLE_ACCOUNT);
+        db.close();
     }
 
-    public long addAccount(String username, String password) {
+    public boolean addAccount(String username, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("username", username);
         cv.put("password", password);
-        cv.put("password", Calendar.getInstance().getTime().getTime());
-
-        long insert = db.insert(TABLE_ACCOUNT, null,cv);
-        print("add username=" + insert);
+        cv.put("time", Calendar.getInstance().getTime().getTime());
+        long insert = -1;
+        if (hasAccount(username, db)) {
+            updatePassword(username, password);
+            insert = 10;
+        } else {
+            insert = db.insert(TABLE_ACCOUNT, null, cv);
+        }
+        print("Luu tai khoan: " + cv.toString() + "\t" + result((int) insert));
         db.close();
-        
-        return insert;
+        return insert > 0;
     }
 
-    public long updatePassword(String username, String password) {
+    public boolean hasAccount(String username, SQLiteDatabase db) {
+        int index = 0;
+        String sql = String.format("select username from " + TABLE_ACCOUNT + " where username=\"%s\"", username);
+        Cursor cursor = db.rawQuery(sql, null);
+        index = cursor.getCount();
+        print("has account: " + index + "\\" + (index > 0));
+        cursor.close();
+        return index > 0;
+    }
+
+    public boolean updatePassword(String username, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("username", username);
         cv.put("password", password);
         cv.put("time", Calendar.getInstance().getTime().getTime());
 
-        long update = db.update(TABLE_ACCOUNT, cv,"username=?", new String[]{username});
-        print("insert password=" + update);
+        long update = db.update(TABLE_ACCOUNT, cv, "username=?", new String[]{username});
+        print("tai khoan: " + cv.toString() + "\t" + result((int) update));
         db.close();
-        return update;
+        return update > 0;
     }
 
-    public int getSize(String name, String table)
-    {
+    public int getSize(String name, String table) {
         String sql = "select " + name + " where" + table;
         Cursor cursor = getReadableDatabase().rawQuery(sql, null);
         int index = cursor.getCount();
@@ -148,7 +168,6 @@ public class Database extends SQLiteOpenHelper {
 
     //Lay tat ca danh ba co trong db
     public List<Order> getAllCart() {
-        List<Order> list = new ArrayList<>();
         //Truy van sql
         String sql = "select id,name,price,image,amount from " + TABLE_CART;
         //Lay doi tuong db sqlite
@@ -156,7 +175,9 @@ public class Database extends SQLiteOpenHelper {
         //Chay cau truy van tra ve dang cursor
         Cursor cur = db.rawQuery(sql, null);
         //Tao ArrayList de tra ve
-        print("current=" +  cur.toString() + "  \t\t\ttindex=" + cur.getCount());
+        List<Order> list = new ArrayList<>(10);
+
+        print("So luong trong kho: " + cur.getCount());
 
         if (cur != null)
             while (cur.moveToNext()) {
@@ -170,15 +191,21 @@ public class Database extends SQLiteOpenHelper {
                 list.add(order);
             }
 
+        cur.close();
         db.close();
         return list;
+    }
+
+
+    public String getString(String text) {
+        return "\"" + text + "\"";
     }
 
     public static void print(String text) {
         Log.d("userinfo", text);
     }
 
-    public long addOrder(Order order) {
+    public boolean addOrder(Order order) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("id", order.getId());
@@ -186,14 +213,16 @@ public class Database extends SQLiteOpenHelper {
         cv.put("price", order.getPrice());
         cv.put("amount", order.getAmount());
         cv.put("image", order.getImage());
+
 
         long insert = db.insert(TABLE_CART, null, cv);
-        print("insert = "+insert);
+
+        print("Insert Order: " + order + "\t" + result((int) insert));
         db.close();
-        return insert;
+        return insert > 0;
     }
 
-    public long updateCart(int id, Order order) {
+    public boolean updateCart(int id, Order order) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("id", order.getId());
@@ -203,21 +232,60 @@ public class Database extends SQLiteOpenHelper {
         cv.put("image", order.getImage());
 
 
-        long update = db.update(TABLE_CART, cv, "id=?", new String[]{String.valueOf(id)});
-        print("update = " + update);
+        long update = db.update(TABLE_CART, cv, "id=" + id, null);
+        print("Update Order: " + order + "\t" + result((int) update));
         db.close();
-        return update;
+        return update > 0;
     }
 
-    public int deleleOrder(int id) {
+    public void updateUnit(int id, int soluong) {
+        String sql = String.format("Update %s Set amount = amount+%s where id = %s", TABLE_CART,
+                soluong, id);
         SQLiteDatabase db = getWritableDatabase();
-        int del = -1;
-        String where = "id=";
-        where += id == -1 ? "*" : id;
-        del = db.delete(TABLE_CART, where,null);
+        db.execSQL(sql);
+        db.close();
+    }
+
+    public boolean contain(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select count(id) from " + TABLE_CART + " where id=" + id, null);
+        int amount = cursor.getCount();
+        cursor.close();
+        ;
+        db.close();
+        return amount > 0;
+    }
+
+
+    public boolean deleleOrder(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        int del = 0;
+        if (id == DEL_ALL) {
+            db.execSQL("delete from " + TABLE_CART);
+            del = 1000;
+        } else
+            del = db.delete(TABLE_CART, "id=" + id, null);
 
         db.close();
-        print("delete = " + del +"\t\t" + where);
-        return del;
+        print("Delete Order:  " + id + "\t" + result(del));
+        return del > 0;
+    }
+
+    public boolean deleteOrders(List<Order> ids) {
+        SQLiteDatabase db = getWritableDatabase();
+        int del = 0;
+
+        for (Order item : ids)
+            del += db.delete(TABLE_CART, "id=" + item.getId(), null);
+        db.close();
+        print("Delete Order:  " + del + "\t" + result(del));
+        return del > 0;
+    }
+
+    public static String result(int index) {
+        if (index > 0)
+            return "Success";
+        else
+            return "Faile";
     }
 }

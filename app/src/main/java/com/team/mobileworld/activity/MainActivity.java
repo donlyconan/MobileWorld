@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
@@ -20,34 +21,27 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.google.android.material.navigation.NavigationView;
-import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
 import com.team.mobileworld.core.NetworkCommon;
-import com.team.mobileworld.core.handle.APIhandler;
-import com.team.mobileworld.core.handle.ItemTest;
+import com.team.mobileworld.core.database.Database;
+import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.handle.ValidNetwork;
-import com.team.mobileworld.core.object.ItemList;
+import com.team.mobileworld.core.object.CatalogItem;
+import com.team.mobileworld.core.object.Message;
 import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.User;
-import com.team.mobileworld.core.service.CartService;
+import com.team.mobileworld.core.service.BasketService;
+import com.team.mobileworld.core.service.NotificationService;
 import com.team.mobileworld.core.service.UserService;
-import com.team.mobileworld.database.Database;
 import com.team.mobileworld.fragment.CustomViewFragement;
 import com.team.mobileworld.fragment.LoadFragement;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -60,28 +54,25 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    public static final String APP_NAME = "Mobile Word";
-
-    public static final String TAG = "tagmain";
     public static final String MESSAGE = "message";
     public static final String ERROR = "error";
     public static final String TOKEN = "token";
+    public static final String TAG = "user debug";
+
     public static final String MAIN_OPEN_ORDER = "MAIN_OPEN_ORDER";
     public static final String DATABASE_NAME = "MOBILE_APP";
-    public static final String AUTO_LOGIN = "AUTO_LOGIN";
-
-    public static final int STATUS_NOT_LOGIN = 0;
-    public static final int STATUS_LOGIN_NOT_PHONE = 1;
-    public static final int STATUS_NOT_ADDRESS = 2;
-    public static final int STATUS_VALID= 3;
+    public static final String ACTION_AUTO_LOGIN = "Auto Login";
 
     public static final int RQ_OPEN_LOGIN = 55;
     public static final int CURRENT_VERSION = 1;
-    private static final int OPEN_ORDER = 100;
-    private static final int OPEN_PRODUCT = 101;
-    private static final List<Order> Cart = new ArrayList<>();
-    private static User user;
+    public static final int OPEN_ORDER = 100;
+    public static final int OPEN_PRODUCT = 101;
+
+    private static final List<Order> Cart = new ArrayList<>(50);
+    private static final long WAIT_TIME = 5000;
+    private static User user = new User(); //Chua dinh danh user
     private static Database db;
+    public static boolean NewLogin = false;
 
     ImageButton btnNav;
     DrawerLayout drawer;
@@ -89,11 +80,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FragmentManager fmanager;
     CustomViewFragement fragcview;
     LoadFragement fragload;
-    List<ItemList> goods;
-    SearchView searchView;
+    List<CatalogItem> goods;
+    TextView textsearch;
     CircleImageView imgprofit;
     NavigationView navview;
     ImageButton btngiohang;
+    List<CatalogItem> listpage;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -101,25 +93,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, data + "");
 
-        //Cap nhat so luong
-        if (requestCode == ProductDetail.REPLACE_SIZE)
-            txtSLuong.setText(APIhandler.getTotalAmount(getCart()) + "");
-
-
         //Xuat thong tin nguoi dung dang nhap
         if (requestCode == RQ_OPEN_LOGIN && resultCode == LoginActivity.ADD_INFO_USER) {
-            user = (User) data.getExtras().getSerializable(LoginActivity.ITEM_USER);
-            Log.d(TAG, "AMain: " + user.toString());
+            if (user == null) {
+                loadUserInfo();
+            }
+        }
 
+        if (user.isLogin() && NewLogin) {
+            NewLogin = false;
             txtfullname.setText(user.getFullname());
             txtemail.setText(user.getEmail());
-            Picasso.get().load(user.getProfit()).fit().error(R.drawable.ic_profit).into(imgprofit);
+            Handler.loadImage(this, user.getProfit(), imgprofit);
+            txtSLuong.setText(Handler.totalSize(Cart) + "");
         }
 
-        if (requestCode == RQ_OPEN_LOGIN && resultCode == LoginActivity.REQUEST_LOAD_INFOUSER) {
-            loadUserInfo();
-            loadDataToCart();
-        }
+        txtSLuong.setText(Handler.getTotalAmount(getCart()) + "");
+        if (!fragload.getProgressBar().isIndeterminate())
+            loadPageView("home");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -135,58 +126,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         init();
 
         //Xu ly su kien
-        btngiohang.setOnClickListener(e -> startActivityForResult(new Intent(MainActivity.this, CartActivity.class), ProductDetail.REPLACE_SIZE));
+        btngiohang.setOnClickListener(e -> startActivityForResult(new Intent(getApplicationContext()
+                , CartActivity.class), ProductDetail.REQUEST_SIZE_AMOUNT));
+
+        textsearch.setOnClickListener(e -> openActivitySearch());
 
         btnNav.setOnClickListener(e -> drawer.openDrawer(GravityCompat.START));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            fragcview = new CustomViewFragement(ItemTest.getItemList(), fragload);
+            listpage = new ArrayList<>();
+            fragcview = new CustomViewFragement(listpage, fragload);
             fragcview.onAttach(this);
-            txtSLuong.setText(APIhandler.getTotalAmount(getCart()) + "");
+            txtSLuong.setText(Handler.getTotalAmount(getCart()) + "");
         }
 
         int commit = fmanager.beginTransaction().replace(R.id.frag_main, fragcview).commit();
 
-//        loadPageView("home");
+        loadPageView("home");
 
-        if (validUser() != 0) {
+        if (user.isLogin()) {
             loadUserInfo();
-            loadDataToCart();
+            loadServerData();
         } else {
-            loadDataToCartFrom();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                txtSLuong.setText(APIhandler.getTotalAmount(getCart()) + "");
-            }
+            loadLocalData();
         }
 
+        txtSLuong.setText(Handler.totalSize(Cart) + "");
+        Database.print("Tổng số lượng trong giỏ: " + Handler.totalSize(Cart));
         getInfoPackage();
     }
 
-    private void loadDataToCartFrom() {
-        List<Order> orders = db.getAllCart();
-        getCart().addAll(orders);
+    private void openActivitySearch() {
+        Intent intent = new Intent(this, ResultSearchActivity.class);
+        startActivityForResult(intent, 10);
+        CustomIntent.customType(this, Animation.FADE_IN_TO_OUT);
     }
 
-    /**
-     * status:
-     * 0: chưa được xác nhận
-     * 1: Không có số điện thoại
-     * 2: chưa có đại chỉ
-     * 3: tài khoản hợp lệ
-     *
-     * @return
-     */
-    public static int validUser() {
+    public void showToast(String message) {
+        Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+    }
 
-        if (user == null) return 0;
-        //User chưa được xác nhận
-        if (user.getId() == 0) return 0;
-        //Không có số điện thoại
-        if (user.getPnumber() == null && user.getPnumber().length() == 0) return 1;
-        //Không có địa chỉ
-        if (user.getAddress() == null && user.getAddress().length() == 0) return 2;
+    private void loadLocalData() {
+        List<Order> orders = db.getAllCart();
+        getCart().addAll(orders);
 
-        return 3;
+        Database.print("Load Kho hang: " + Cart.size() + " san pham");
     }
 
     //Khởi tạo
@@ -208,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btnNav = findViewById(R.id.btn_nav);
         btngiohang = findViewById(R.id.btGiohang);
         navview = findViewById(R.id.nav_view);
-        searchView = findViewById(R.id.search_bar);
+        textsearch = findViewById(R.id.txtsearch);
 
         final View header = navview.getHeaderView(0);
         txtfullname = header.findViewById(R.id.txt_fullname);
@@ -222,13 +206,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //Tải dữ liệu sản phẩm
     public void loadPageView(String namepage) {
         if (ValidNetwork.hasNetwork(getApplicationContext()))
-            fragcview.loadPage("home");
+            fragcview.loadPage(namepage);
         else
-            new AlertDialog.Builder(this).setTitle(APP_NAME)
-                    .setMessage("Không có kết nối Internet")
-                    .setPositiveButton("Thoát", (e, id) -> MainActivity.this.finish())
-                    .show();
-
+            noNetworkConnection().show();
     }
 
     @Override
@@ -261,102 +241,99 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         switch (id) {
-            case R.id.nav_home: {
+            case R.id.nav_home:
                 loadPageView("home");
-            }
-            break;
-            case R.id.nav_phone: {
+                break;
+            case R.id.nav_phone:
                 loadPageView("mobile");
-            }
-            break;
-            case R.id.nav_laptop: {
+                break;
+            case R.id.nav_laptop:
                 loadPageView("laptop");
-            }
-            break;
+                break;
             case R.id.nav_bill: {
-                if (user == null || user.getId() == 0) {
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    startActivityForResult(intent, RQ_OPEN_LOGIN);
-                } else {
+                if (user.isLogin()) {
                     Intent intent = new Intent(MainActivity.this, BillActivity.class);
                     startActivity(intent);
-                }
+                } else
+                    onStartLogin();
             }
             break;
             case R.id.nav_user: {
-                if (user == null) {
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    startActivityForResult(intent, RQ_OPEN_LOGIN);
-                } else {
+                if (user.isLogin()) {
                     Intent intent = new Intent(this, PersonalInfoActivity.class);
                     startActivity(intent);
-                }
+                } else
+                    onStartLogin();
             }
             break;
             case R.id.nav_logut: {
                 LoginManager.getInstance().logOut();
-                getCart().clear();
                 startActivityForResult(new Intent(this, LoginActivity.class), RQ_OPEN_LOGIN);
             }
             break;
+            case R.id.nav_noti: {
+                if (user.isLogin())
+                    startActivity(new Intent(this, ActivityNotification.class));
+                else
+                    startActivityForResult(new Intent(this, LoginActivity.class), RQ_OPEN_LOGIN);
+            }
+            break;
+            case R.id.nav_feedback:
+                if (user.isLogin())
+                    startActivity(new Intent(this, FeedbackActivity.class));
+                else
+                    startActivityForResult(new Intent(this, LoginActivity.class), RQ_OPEN_LOGIN);
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void loadUserInfo() {
-        AccessToken token = AccessToken.getCurrentAccessToken();
-
-        if(token != null){
-            //API hiển thị activity đăng nhập
-            GraphRequest request = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
-                @Override
-                public void onCompleted(JSONObject object, GraphResponse response) {
-                    try {
-                        user = LoginActivity.getInfoUserFromFacebook(object);
-                        Log.d(TAG, response.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(MainActivity.this.getBaseContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-            Bundle params = new Bundle();
-            params.putString("fields", "name, id, email,birthday, gender,friends");
-            request.setParameters(params);
-            request.executeAsync();
-        }
-        else if(validUser() == STATUS_NOT_LOGIN) {
-            UserService service = NetworkCommon.getRetrofit().create(UserService.class);
-
-            //Thiet lap service lay thong tin
-            Call<User> call = service.getPersonalInfo(user.getId());
-
-            call.enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
-                    MainActivity.setUser(user);
-                }
-
-                @Override
-                public void onFailure(Call<User> call, Throwable t) {
-                    Toast.makeText(MainActivity.this.getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+    public void onStartLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivityForResult(intent, RQ_OPEN_LOGIN);
     }
 
-    private void loadDataToCart() {
-        CartService service = NetworkCommon.getRetrofit().create(CartService.class);
+    private void loadUserInfo() {
+
+        UserService service = NetworkCommon.getRetrofit().create(UserService.class);
+
+        //Thiet lap service lay thong tin
+        Call<User> call = service.getPersonalInfo(user.getId());
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                MainActivity.setUser(user);
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(MainActivity.this.getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public AlertDialog.Builder noNetworkConnection() {
+        return new AlertDialog.Builder(this).setTitle(R.string.app_name)
+                .setMessage("Không có kết nối Internet")
+                .setPositiveButton("Thoát", (e, id) -> MainActivity.this.onBackPressed());
+    }
+
+    private void loadServerData() {
+        BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
 
         Call<List<Order>> call = service.loadCart(user.getId());
 
         call.enqueue(new Callback<List<Order>>() {
             @Override
             public void onResponse(Call<List<Order>> call, Response<List<Order>> response) {
-                getCart().clear();
-                getCart().addAll(response.body());
+                db.print("Json get Cart:" + response.body());
+                if (response.isSuccessful()) {
+                    getCart().clear();
+                    getCart().addAll(response.body());
+                    txtSLuong.setText(Handler.totalSize(Cart) + "");
+                }
             }
 
             @Override
@@ -416,5 +393,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static List<Order> getCart() {
         return Cart;
     }
-
 }

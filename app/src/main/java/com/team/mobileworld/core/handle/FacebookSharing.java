@@ -2,6 +2,7 @@ package com.team.mobileworld.core.handle;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.widget.Toast;
 
@@ -11,17 +12,19 @@ import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.model.ShareVideo;
 import com.facebook.share.model.ShareVideoContent;
 import com.facebook.share.widget.ShareDialog;
+import com.team.mobileworld.R;
+import com.team.mobileworld.activity.LoginActivity;
 
 public class FacebookSharing {
 
     /**
      * Chia se 1 duong link
+     *
      * @param queto
      * @param url
      * @param activity
      */
-    public static void shareLink(String queto, String url, Activity activity)
-    {
+    public static void shareLink(String queto, String url, Activity activity) {
         //Thiet lap 1 dialog hien thi thong tin chia se
         ShareDialog share = new ShareDialog(activity);
 
@@ -36,44 +39,66 @@ public class FacebookSharing {
             Toast.makeText(activity, "Sản phẩm chưa được chia sẻ", Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * Chia se 1 hay nhieu buc anh
-     */
-    public static void shareImage(Bitmap bitmap, String caption, Activity activity){
-        //Thiet lap 1 man hinh share
-        ShareDialog shareDialog = new ShareDialog(activity);
-
-        //Thiet lap noi dung share
-        SharePhoto sharePhoto = new SharePhoto.Builder()
+    public static SharePhoto createPhoto(Bitmap bitmap){
+       return new SharePhoto.Builder()
                 .setBitmap(bitmap)
-                .setCaption(caption)
                 .build();
-
-        SharePhotoContent share = new SharePhotoContent.Builder()
-                .addPhoto(sharePhoto)
-                .build();
-        shareDialog.show(share);
     }
 
     /**
-     * Chia se 1 video, hay bai hat
+     * Chia se anh len facebook
      */
+    public static void shareImage(Bitmap bitmap, String caption, Activity activity) {
+        //Thiet lap 1 man hinh share
+        ShareDialog dialog = new ShareDialog(activity);
 
-    public static void shareVideo(Uri uri, String title, String decription, Activity activity)
-    {
-        ShareDialog shareDialog = new ShareDialog(activity);
+        if (dialog.canShow(SharePhotoContent.class)) {
+            //Thiet lap noi dung share
+            SharePhoto sharePhoto = new SharePhoto.Builder()
+                    .setBitmap(bitmap)
+                    .setCaption(caption)
+                    .build();
 
-        ShareVideo shareVideo = new ShareVideo.Builder()
-                .setLocalUrl(uri)
-                .build();
+            //Thiet lap mot mau share
+            SharePhotoContent share = new SharePhotoContent.Builder()
+                    .addPhoto(sharePhoto)
+                    .build();
 
-        ShareVideoContent shareContent = new ShareVideoContent.Builder()
-                .setVideo(shareVideo)
-                .setContentDescription(decription)
-                .setContentTitle(title)
-                .build();
+            dialog.show(share, ShareDialog.Mode.AUTOMATIC);
+            LoginActivity.showToast(activity, "Chia sẻ thành công!");
+        } else
+            Toast.makeText(activity, "Sản phẩm chưa được chia sẻ", Toast.LENGTH_SHORT).show();
+    }
 
-        shareDialog.show(shareContent);
+
+    /**
+     * CHia se mot noi dung video len facebook
+     */
+    public static void shareVideo(Uri uri, String title, String decription, Activity activity) {
+        ShareDialog dialog = new ShareDialog(activity);
+
+        if (dialog.canShow(SharePhotoContent.class)) {
+            //thiet lap bo load
+            ShareVideo shareVideo = new ShareVideo.Builder()
+                    .setLocalUrl(uri)
+                    .build();
+
+            SharePhoto sharePhoto = new SharePhoto.Builder()
+                    .setBitmap(BitmapFactory.decodeResource(null,R.drawable.ic_video))
+                    .build();
+
+            //Thiet lap noi dung video
+            ShareVideoContent shareContent = new ShareVideoContent.Builder()
+                    .setVideo(shareVideo)
+                    .setPreviewPhoto(createPhoto(BitmapFactory.decodeResource(null,R.drawable.ic_video)))
+                    .setContentDescription(decription)
+                    .setContentTitle(title)
+                    .build();
+
+            dialog.show(shareContent, ShareDialog.Mode.AUTOMATIC);
+            LoginActivity.showToast(activity, "Chia sẻ thành công!");
+        } else
+            Toast.makeText(activity, "Sản phẩm chưa được chia sẻ", Toast.LENGTH_SHORT).show();
     }
 
 

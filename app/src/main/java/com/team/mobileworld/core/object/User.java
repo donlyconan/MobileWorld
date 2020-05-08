@@ -1,15 +1,25 @@
 package com.team.mobileworld.core.object;
 
-import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.team.mobileworld.core.handle.Validate;
 
 import java.io.Serializable;
 
 public class User implements Serializable {
+    public static final int ANONYMOUS = -1;
+    public static final int LOGIN_ACCOUNT = 0;
+    public static final int LOGIN_FACEBOOK = 1;
+    public static final int LOGIN_GOOGLE = 2;
 
     @SerializedName("id")
-    private long id = 0;
+    private long id = ANONYMOUS;
+
+    @SerializedName("username")
+    private String username;
+
+    @SerializedName("password")
+    private String password;
 
     @SerializedName("fullname")
     @Expose
@@ -35,7 +45,7 @@ public class User implements Serializable {
     @Expose
     private String address;
 
-    @SerializedName("pnumber")
+    @SerializedName("phonenumber")
     @Expose
     private String pnumber;
 
@@ -43,6 +53,11 @@ public class User implements Serializable {
     @Expose
     private int gender = 0;
 
+    private int link = LOGIN_ACCOUNT;
+
+    public User() {
+        this.id = -1;
+    }
 
     public User(long id) {
         this.id = id;
@@ -65,6 +80,17 @@ public class User implements Serializable {
         return text == null ? "" : text;
     }
 
+    public boolean isLogin() {
+        return id > 0;
+    }
+
+    public boolean hasPhoneNumber() {
+        return Validate.valid(pnumber, Validate.REGEX_PHONE_NUMBER);
+    }
+
+    public boolean hasAddress() {
+        return Validate.valid(address, Validate.REGEX_ADDRESS);
+    }
 
     @Override
     public String toString() {
@@ -72,6 +98,16 @@ public class User implements Serializable {
                 + ", bground=" + bground + ", bdate=" + bdate + ", address=" + address + ", pnumber=" + pnumber + "]";
     }
 
+    public String statusLogin() {
+        switch (link) {
+            case LOGIN_FACEBOOK:
+                return "Bạn đang đăng nhập bằng tài khoản Facebook";
+            case LOGIN_GOOGLE:
+                return "Bạn đang đăng nhập bằng tài khoản Google";
+            default:
+                return "Bạn đang đăng nhập bằng tài khoản MobileWorld";
+        }
+    }
 
     public String getFullname() {
         return fullname;
@@ -145,9 +181,23 @@ public class User implements Serializable {
         return email;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public int getLink() {
+        return link;
+    }
+
+    public void setLink(int link) {
+        this.link = link;
+    }
 }

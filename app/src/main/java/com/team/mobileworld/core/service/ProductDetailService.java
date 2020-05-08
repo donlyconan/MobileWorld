@@ -9,10 +9,9 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface ProductDetailService {
-	
 	public static final String URL_PRODUCT_INFO = "api/catalog/{id}";
 	
-	public static final String URL_TECHNICAL_INFO = "api/catalog/technical/{id}";
+	public static final String URL_TECHNICAL_INFO = "api/catalog/detail/{id}";
 
 	
 	/**
@@ -20,7 +19,7 @@ public interface ProductDetailService {
 	 * Nhận về: Thông tin về sản phẩm dưới dạng object
 	 */
 	@GET(URL_PRODUCT_INFO)
-	Call<Product> getProductDetail(@Path(value = "id") int id);
+	Call<Product> getProductDetail(@Path(value = "id") int catalogid);
 	
 	
 	/**
@@ -29,6 +28,5 @@ public interface ProductDetailService {
 	 * object: ProductInfo
 	 */
 	@GET(URL_TECHNICAL_INFO)
-	Call<ResponseBody> getTechnicalData(@Path("id") int id);
-	
+	Call<ResponseBody> getTechnicalData(@Path("id") int catalogid);
 }

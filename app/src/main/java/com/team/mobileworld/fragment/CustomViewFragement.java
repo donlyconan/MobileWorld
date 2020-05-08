@@ -2,7 +2,7 @@ package com.team.mobileworld.fragment;
 
 
 import android.app.Activity;
-import android.app.ActivityManager;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,10 +25,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
 import com.team.mobileworld.activity.MainActivity;
-import com.team.mobileworld.adapter.CustomListAdapter;
+import com.team.mobileworld.activity.ProductDetail;
+import com.team.mobileworld.adapter.CatalogItemAdapter;
 import com.team.mobileworld.core.NetworkCommon;
-import com.team.mobileworld.core.handle.ItemTest;
-import com.team.mobileworld.core.object.ItemList;
+import com.team.mobileworld.core.database.Database;
+import com.team.mobileworld.core.object.CatalogItem;
+import com.team.mobileworld.core.object.Product;
 import com.team.mobileworld.core.service.LoadProductService;
 
 import java.util.ArrayList;
@@ -39,33 +41,30 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CustomViewFragement extends Fragment {
-    public static final int VERTICAL = 10;
-    public static final int HORIZONTAL = -10;
+    public static final int VERTICAL = 1;
+    public static final int HORIZONTAL = -1;
     public static final int GRID = 0;
 
     protected HomeHolder holder;
-    protected List<ItemList> goods;
-    protected CustomListAdapter cadapter;
+    protected List<CatalogItem> goods;
+    protected CatalogItemAdapter adapter;
     protected LoadFragement fragload;
     protected MainActivity activity;
+    protected Call<List<CatalogItem>> call;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public CustomViewFragement(List<ItemList> goods, LoadFragement loadFragement) {
+    public CustomViewFragement(List<CatalogItem> goods, LoadFragement loadFragement) {
         this.goods = goods;
         this.fragload = loadFragement;
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onAttach(@NonNull Activity context) {
-        goods.removeIf(e->e.getProducts().size() == 0);
-        cadapter = new CustomListAdapter(context, goods);
+        adapter = new CatalogItemAdapter(context, goods);
         this.activity = (MainActivity) context;
         super.onAttach(context);
     }
-    
-    
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
@@ -75,35 +74,53 @@ public class CustomViewFragement extends Fragment {
         holder = new HomeHolder(view);
         holder.recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         holder.recycler.setHasFixedSize(true);
-        holder.recycler.setAdapter(cadapter);
+        holder.recycler.setAdapter(adapter);
         actionViewFlipper();
         return view;
     }
 
 
-    public void loadPage(final String page){
+    public void loadPage(final String page) {
+        closeLoad();
+
         activity.getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frag_main, fragload).commit();
-        
+
         LoadProductService service = NetworkCommon.getRetrofit().create(LoadProductService.class);
 
         //Goi lai service lay du lieu
-        Call<List<ItemList>> call = service.openLoadDataonPage(page);
-        call.enqueue(new Callback<List<ItemList>>() {
-            @Override
-            public void onResponse(Call<List<ItemList>> call, Response<List<ItemList>> response) {
-                goods = response.body();
-                cadapter.notifyDataSetChanged();
+        call = service.openLoadDataOnPage(page);
+        Database.print(call.request().toString());
 
-                int commit = activity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.frag_main, CustomViewFragement.this).commit();
+        call.enqueue(new Callback<List<CatalogItem>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onResponse(Call<List<CatalogItem>> call, Response<List<CatalogItem>> response) {
+                if (response.isSuccessful()) {
+                    goods = response.body();
+                    goods.removeIf(e -> e.getProducts() == null || e.getProducts().size() == 0);
+                    adapter = new CatalogItemAdapter(getActivity(), goods);
+                    adapter.notifyDataSetChanged();
+
+                    Database.print("size goods=" + goods.size());
+
+                    if (goods.size() == 0)
+                        fragload.error();
+                    else
+                        activity.getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.frag_main, CustomViewFragement.this).commitAllowingStateLoss();
+                } else fragload.error();
+
             }
 
             @Override
-            public void onFailure(Call<List<ItemList>> call, Throwable t) {
+            public void onFailure(Call<List<CatalogItem>> call, Throwable t) {
                 Toast.makeText(activity, "Lỗi: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                fragload.error();
+                fragload.setWorker(() -> loadPage(page));
+                Database.print("error: " + t.getMessage());
             }
         });
     }
@@ -122,13 +139,13 @@ public class CustomViewFragement extends Fragment {
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             holder.flipper.addView(imageView);
         }
-        
-        
+
+
         //thời gian chuyển
         holder.flipper.setFlipInterval(5000);
         holder.flipper.setAutoStart(true);
 
-        android.view.animation.Animation animation_slide_in = AnimationUtils.loadAnimation(getActivity() , android.R.anim.slide_in_left);
+        android.view.animation.Animation animation_slide_in = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left);
         Animation animation_slide_out = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right);
 
         //set animation
@@ -136,7 +153,7 @@ public class CustomViewFragement extends Fragment {
         holder.flipper.setOutAnimation(animation_slide_out);
     }
 
-    public void print(String text){
+    public void print(String text) {
         Log.d("debug", text);
     }
 
@@ -151,6 +168,12 @@ public class CustomViewFragement extends Fragment {
         }
     }
 
+    public void closeLoad() {
+        if(call != null)
+        synchronized (call) {
+            call.cancel();
+        }
+    }
 
     public HomeHolder getHolder() {
         return holder;
@@ -160,19 +183,19 @@ public class CustomViewFragement extends Fragment {
         this.holder = holder;
     }
 
-    public List<ItemList> getGoods() {
+    public List<CatalogItem> getGoods() {
         return goods;
     }
 
-    public void setGoods(List<ItemList> goods) {
+    public void setGoods(List<CatalogItem> goods) {
         this.goods = goods;
     }
 
-    public CustomListAdapter getCadapter() {
-        return cadapter;
+    public CatalogItemAdapter getCadapter() {
+        return adapter;
     }
 
-    public void setCadapter(CustomListAdapter cadapter) {
-        this.cadapter = cadapter;
+    public void setCadapter(CatalogItemAdapter cadapter) {
+        this.adapter = cadapter;
     }
 }

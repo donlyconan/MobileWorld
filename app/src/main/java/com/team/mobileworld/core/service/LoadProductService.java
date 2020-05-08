@@ -1,21 +1,15 @@
 package com.team.mobileworld.core.service;
 
-import android.graphics.pdf.PdfDocument;
-
-import androidx.viewpager.widget.ViewPager;
-
-import com.team.mobileworld.core.object.ItemList;
+import com.team.mobileworld.core.object.CatalogItem;
 import com.team.mobileworld.core.object.Product;
 
 import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
-import retrofit2.http.FieldMap;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
-import retrofit2.http.Url;
 
 public interface LoadProductService {
 	
@@ -48,21 +42,22 @@ public interface LoadProductService {
 	 *Limit
 	 * */
 	@GET(URL_HOME_PAGE)
-	Call<List<ItemList>> loadHomePage();
+	Call<List<CatalogItem>> loadHomePage();
 
 	/**
 	 *  Lấy dữ liệu thông tin sản phầm cho trang View Smartphone
 	 * @return
 	 */
 	@GET(URL_SMARTPHONE_PAGE)
-	Call<List<ItemList>> loadSmartphonePage();
+	Call<List<CatalogItem>> loadSmartphonePage();
 
 	/**
 	 *  Lấy dữ liệu thông tin sản phầm cho trang View Laptop
 	 * @return
 	 */
 	@GET(URL_LAPTOP_PAGE)
-	Call<ItemList> loadLaptopPage();
+	Call<CatalogItem> loadLaptopPage();
+
 
 	/**
 	 * Page: cung cấp đường dẫn Vị trí trang cần tải
@@ -73,7 +68,7 @@ public interface LoadProductService {
 	 * @return
 	 */
 	@GET(URL_LOAD_PAGE)
-	Call<List<ItemList>>  openLoadDataonPage(@Path("page") String page);
+	Call<List<CatalogItem>>  openLoadDataOnPage(@Path("page") String page);
 
 	/**
 	 *  Tải thêm sản phẩm khi được yêu cầu

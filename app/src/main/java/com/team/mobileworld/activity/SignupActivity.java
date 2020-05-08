@@ -14,21 +14,18 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.gson.JsonObject;
 import com.team.mobileworld.R;
 import com.team.mobileworld.core.NetworkCommon;
-import com.team.mobileworld.core.handle.APIhandler;
+import com.team.mobileworld.core.handle.Validate;
 import com.team.mobileworld.core.object.User;
-import com.team.mobileworld.core.service.SignUpService;
+import com.team.mobileworld.core.service.RegisterService;
 import com.team.mobileworld.core.service.UserService;
-
-import java.io.IOException;
-import java.io.Serializable;
+import com.team.mobileworld.core.database.Database;
 
 import maes.tech.intentanim.CustomIntent;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
@@ -56,16 +53,11 @@ public class SignupActivity extends AppCompatActivity {
             }
         });
 
-        _loginLink.setOnClickListener(v->{
-                // Finish the registration screen and return to the Login activity
-                Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
-                startActivity(intent);
-                finish();
-        });
+        _loginLink.setOnClickListener(v -> finish());
     }
 
     private void anhxa() {
-        _username = findViewById(R.id.inp_username);
+        _username = findViewById(R.id.inp_newpass);
         _nameText = findViewById(R.id.inp_fullname);
         _emailText = findViewById(R.id.inp_email);
         _passwordText = findViewById(R.id.inp_password);
@@ -83,13 +75,11 @@ public class SignupActivity extends AppCompatActivity {
             return;
         }
 
-        _signupButton.setEnabled(false);
-
-        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
-                R.style.AppTheme_Dark_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Creating Account...");
-        progressDialog.show();
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setIndeterminate(true);
+        progress.setCancelable(false);
+        progress.setMessage("Đang xử lý...");
+        progress.show();
 
         String username = _username.getText().toString();
         String name = _nameText.getText().toString();
@@ -102,40 +92,90 @@ public class SignupActivity extends AppCompatActivity {
 
 
         // TODO: Implement your own signup logic here.
+        RegisterService service = NetworkCommon.getRetrofit().create(RegisterService.class);
 
-        new android.os.Handler().postDelayed(() -> {
-                    SignUpService service = NetworkCommon.getRetrofit().create(SignUpService.class);
+        Call<User> call = service.registerAccount(username, password, email);
 
-                    Call<ResponseBody> call = service.registerAccount(username, password,  email);
+        Database.print("Sign up: " + call.request());
 
-                    try {
-                        ResponseBody data = call.execute().body();
-                        JsonObject json = APIhandler.convertToJSon(data.string());
-                        if(json.has("message")) {
-                            User user = new User(Long.valueOf(json.get("id").toString()),name,email,null,null,null,gender,null,null );
-                            UserService update = NetworkCommon.getRetrofit().create(UserService.class);
-                            Call<ResponseBody> callupdate = update.updatePersonalInfo(user);
-                            call.enqueue(null);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User user = response.body();
+                Database.print("Sign up user: " + user);
 
-                            getAlertBuilder("Đăng khoản thành công.").show();
-                        } else {
-                            getAlertBuilder("Đăng ký thất bại: " + json.get("error")).show();
+                if (user != null && response.isSuccessful()) {
+                    user.setGender(user.getGender());
+                    user.setFullname(name);
+
+                    UserService update = NetworkCommon.getRetrofit().create(UserService.class);
+                    Call<User> callupdate = update.updatePersonalInfo(user);
+
+                    Database.print("Update user: " + callupdate.request());
+
+                    callupdate.enqueue(new Callback<User>() {
+                        @Override
+                        public void onResponse(Call<User> call, Response<User> response) {
+                            User user = response.body();
+                            if (response.isSuccessful() && user != null) {
+                                MainActivity.setUser(user);
+                            }
                         }
-                    } catch (IOException e) {
-                        Toast.makeText(SignupActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                    // depending on success
+
+                        @Override
+                        public void onFailure(Call<User> call, Throwable t) {
+
+                        }
+                    });
+                    MainActivity.setUser(user);
+                    getAlertBuilder("Đăng ký tài khoản thành công.").show();
                     onSignupSuccess();
-                    // onSignupFailed();
-                    progressDialog.dismiss();
-                }, 3000);
+                } else {
+                    getAlertBuilder("Tài khoản đã tồn tại!").show();
+                }
+                progress.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
+                progress.dismiss();
+            }
+        });
+
+
     }
 
-    public AlertDialog.Builder getAlertBuilder(String content){
-        return new AlertDialog.Builder(this).setTitle(MainActivity.APP_NAME)
+    public AlertDialog.Builder getAlertBuilder(String content) {
+        return new AlertDialog.Builder(this).setTitle(R.string.app_name)
                 .setMessage(content).setPositiveButton("OK", null);
     }
 
+    public boolean validate() {
+        boolean valid = true;
+        if (!Validate.valid(_nameText.getText().toString(), Validate.REGEX_NAME)) {
+            _nameText.setError("Tên không hợp lệ.");
+            valid = false;
+        }
+        if (!Validate.valid(_emailText.getText().toString(), Validate.REGEX_EMAIL)) {
+            _emailText.setError("Email không hợp lệ.");
+            valid = false;
+        }
+        if (!Validate.valid(_username.getText().toString(), Validate.REGEX_USERNAME)) {
+            _username.setError("Tên đăng không hợp lệ.");
+            valid = false;
+        }
+        if (!Validate.valid(_passwordText.getText().toString(), Validate.REGEX_PASSWORD)) {
+            _passwordText.setError("Mật khẩu không hợp lệ.");
+            valid = false;
+        }
+        if (!_reEnterPasswordText.getText().toString().equals(_passwordText.getText().toString())) {
+            _reEnterPasswordText.setError("Mật khẩu không trùng khớp");
+            valid = false;
+        }
+        return valid;
+    }
 
     public void onSignupSuccess() {
         _signupButton.setEnabled(true);
@@ -143,55 +183,53 @@ public class SignupActivity extends AppCompatActivity {
         intent.putExtra("username", _username.getText());
         intent.putExtra("password", _passwordText.getText());
         setResult(RESULT_OK, intent);
-        finish();
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
+        Toast.makeText(getBaseContext(), "Đăng ký thất bại!", Toast.LENGTH_LONG).show();
         _signupButton.setEnabled(true);
     }
 
-    public boolean validate() {
-        boolean valid = true;
-
-        String name = _nameText.getText().toString();
-        String email = _emailText.getText().toString();
-        String password = _passwordText.getText().toString();
-        String reEnterPassword = _reEnterPasswordText.getText().toString();
-
-        if (name.isEmpty() || name.length() < 3) {
-            _nameText.setError("at least 3 characters");
-            valid = false;
-        } else {
-            _nameText.setError(null);
-        }
-
-
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("enter a valid email address");
-            valid = false;
-        } else {
-            _emailText.setError(null);
-        }
-
-
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            _passwordText.setError("between 4 and 10 alphanumeric characters");
-            valid = false;
-        } else {
-            _passwordText.setError(null);
-        }
-
-        if (reEnterPassword.isEmpty() || reEnterPassword.length() < 4 || reEnterPassword.length() > 10 || !(reEnterPassword.equals(password))) {
-            _reEnterPasswordText.setError("Password Do not match");
-            valid = false;
-        } else {
-            _reEnterPasswordText.setError(null);
-        }
-
-        return valid;
-    }
+//    public boolean validate() {
+//        boolean valid = true;
+//
+//        String name = _nameText.getText().toString();
+//        String email = _emailText.getText().toString();
+//        String password = _passwordText.getText().toString();
+//        String reEnterPassword = _reEnterPasswordText.getText().toString();
+//
+//        if (name.isEmpty() || name.length() < 3) {
+//            _nameText.setError("at least 3 characters");
+//            valid = false;
+//        } else {
+//            _nameText.setError(null);
+//        }
+//
+//
+//        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//            _emailText.setError("enter a valid email address");
+//            valid = false;
+//        } else {
+//            _emailText.setError(null);
+//        }
+//
+//
+//        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
+//            _passwordText.setError("between 4 and 10 alphanumeric characters");
+//            valid = false;
+//        } else {
+//            _passwordText.setError(null);
+//        }
+//
+//        if (reEnterPassword.isEmpty() || reEnterPassword.length() < 4 || reEnterPassword.length() > 10 || !(reEnterPassword.equals(password))) {
+//            _reEnterPasswordText.setError("Password Do not match");
+//            valid = false;
+//        } else {
+//            _reEnterPasswordText.setError(null);
+//        }
+//
+//        return valid;
+//    }
 
     @Override
     public void startActivity(Intent intent) {

@@ -44,7 +44,7 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:weightSum="2" >
+                android:weightSum="2">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                     <ImageView
                         android:id="@+id/img_background"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="230dp"
                         android:layout_marginBottom="60dp"
                         android:background="@drawable/img_back"
                         android:minHeight="140dp"
@@ -69,15 +69,15 @@
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/img_profit"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
                         android:src="@drawable/ic_profit"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.498"
+                        app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/img_background"
-                        app:layout_constraintVertical_bias="1.0" />
+                        app:layout_constraintVertical_bias="0.964" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -117,9 +117,9 @@
                     android:background="@android:color/transparent"
                     android:ems="10"
                     android:gravity="right"
+                    android:hint="Tên người dùng"
                     android:inputType="textPersonName"
                     android:padding="5dp"
-                    android:hint="Tên người dùng"
                     android:textSize="15sp" />
             </TableRow>
 
@@ -145,11 +145,11 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:ems="10"
-                    android:textColor="#000"
                     android:gravity="right"
+                    android:hint="Tên đăng nhập"
                     android:inputType="textPersonName"
                     android:padding="5dp"
-                    android:hint="Tên đăng nhập"
+                    android:textColor="#000"
                     android:textSize="15sp" />
 
             </TableRow>
@@ -172,15 +172,15 @@
                     android:id="@+id/txt_password"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:ems="10"
+                    android:focusable="false"
                     android:gravity="right"
+                    android:hint="Mật khẩu"
                     android:inputType="textPassword"
                     android:padding="5dp"
-                    android:hint="Mật khẩu"
                     android:textSize="15sp" />
             </TableRow>
 
@@ -207,8 +207,9 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:gravity="right"
-                    android:padding="5dp"
                     android:hint="Ngày sinh"
+                    android:inputType="datetime"
+                    android:padding="5dp"
                     android:textColor="#000"
                     android:textSize="15sp" />
             </TableRow>
@@ -263,9 +264,9 @@
                     android:background="@android:color/transparent"
                     android:ems="10"
                     android:gravity="right"
-                    android:inputType="textPersonName"
-                    android:padding="5dp"
                     android:hint="Số điện thoại"
+                    android:inputType="text|number"
+                    android:padding="5dp"
                     android:textSize="15sp" />
             </TableRow>
 
@@ -292,8 +293,8 @@
                     android:background="@android:color/transparent"
                     android:ems="10"
                     android:gravity="right"
-                    android:hint="Năm sinh"
-                    android:inputType="textPersonName"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
                     android:padding="5dp"
                     android:textSize="15sp" />
             </TableRow>
@@ -302,35 +303,54 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:gravity="start|top"
+                android:orientation="vertical"
                 android:padding="8dp"
                 app:layout_anchorGravity="bottom|center">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
                     android:padding="5dp"
                     android:text="Địa chỉ"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/txt_address"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:ems="10"
-                    android:gravity="right"
-                    android:imeOptions="actionSend"
-                    android:inputType="textMultiLine"
-                    android:maxLines="5"
-                    android:padding="5dp"
-                    android:hint="Địa chỉ"
-                    android:textSize="15sp" />
-            </TableRow>
+                    android:orientation="horizontal">
 
+                    <EditText
+                        android:id="@+id/txt_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="3dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:ems="10"
+                        android:gravity="right"
+                        android:hint="Địa chỉ"
+                        android:imeOptions="actionSend"
+                        android:inputType="textMultiLine"
+                        android:lines="3"
+                        android:padding="5dp"
+                        android:textSize="15sp"
+                        tools:layout_editor_absoluteX="219dp"
+                        tools:layout_editor_absoluteY="1dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnaddaddress"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="0"
+                        android:background="@drawable/ic_location" />
+                </LinearLayout>
+
+            </TableRow>
 
         </TableLayout>
 

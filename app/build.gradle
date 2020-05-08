@@ -28,7 +28,6 @@ android {
 }
 
 dependencies {
-
     def version = "1.2.4"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -57,7 +56,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
+    //Google map
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation "com.google.android.gms:play-services-location:16.0.0"
     //retrofit api
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'

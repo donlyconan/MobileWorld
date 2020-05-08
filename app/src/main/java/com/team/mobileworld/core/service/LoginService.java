@@ -2,7 +2,6 @@ package com.team.mobileworld.core.service;
 
 import com.team.mobileworld.core.object.User;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -27,7 +26,7 @@ public interface LoginService {
 	 */
 	@FormUrlEncoded
 	@POST(URL_LOGIN)
-	Call<ResponseBody> loginAccount(@Field("username") String username, @Field("password") String password);
+	Call<User> loginWithAccount(@Field("username") String username, @Field("password") String password);
 
 	/**
 	 * Hàm đăng nhập hoặc đăng ký liên kết với tài khoản facebook
@@ -42,6 +41,6 @@ public interface LoginService {
 	 */
 
 	@POST(URL_LOGIN_WITH_FACEBOOK)
-	Call<ResponseBody> loginWithFacebook(@Body User user);
+	Call<User> loginWithFacebook(@Body User user);
 
 }

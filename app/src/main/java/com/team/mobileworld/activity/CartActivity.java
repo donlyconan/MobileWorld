@@ -3,7 +3,6 @@ package com.team.mobileworld.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,47 +19,59 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.widget.ShareDialog;
+import com.google.gson.JsonObject;
 import com.team.mobileworld.R;
 import com.team.mobileworld.adapter.CartAdapter;
-import com.team.mobileworld.core.handle.APIhandler;
+import com.team.mobileworld.core.NetworkCommon;
+import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.object.Order;
-import com.team.mobileworld.core.object.User;
-import com.team.mobileworld.database.Database;
+import com.team.mobileworld.core.service.BasketService;
+import com.team.mobileworld.core.database.Database;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import maes.tech.intentanim.CustomIntent;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CartActivity extends AppCompatActivity {
-    private static final int RQ_CHANGE_DATA = 10;
-    private static final String ACTION_LOGIN = "login for buy";
+    private static final int REQUEST_CHANGE_DATA = 0x0000c1;
+    private static final String ACTION_LOGIN = "Login For Buy";
+    private static final int REQUEST_LOGIN_ORDER = 0x0000c2;
+
+    private List<Order> cart;
+    private int amount = 0, index = -1;
+    CartAdapter adapter;
+    private Order item;
 
     ListView listview;
     static TextView txtthanhtien;
     Button btnthanhtoan;
     CheckBox checkall;
     Toolbar toolbarorder;
-    CartAdapter adapter;
-    Fragment fragment;
     Database db;
-    List<Order> cart;
 
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RQ_CHANGE_DATA && resultCode == LoginActivity.ADD_INFO_USER) {
-            MainActivity.setUser((User) data.getExtras().getSerializable(LoginActivity.ITEM_USER));
-        }
-
-        if (requestCode == RQ_CHANGE_DATA) {
+        if (requestCode == REQUEST_CHANGE_DATA && resultCode == RESULT_OK) {
             adapter.notifyDataSetChanged();
             if (adapter.getSize() == 0) checkall.setChecked(false);
+        }
+
+        if (requestCode == REQUEST_LOGIN_ORDER) {
+            Database.print("REQUEST_LOGIN_ORDER");
+            cart = MainActivity.getCart();
+            adapter.setOrderList(cart);
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -70,7 +81,7 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        //Anh xa [han tu
+        //Anh xa phan tu
         elementMaping();
 
         //Cai dat listview
@@ -86,31 +97,31 @@ public class CartActivity extends AppCompatActivity {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                txtthanhtien.setText(APIhandler.formatMoney(APIhandler.getTotalMoneySelected(cart)));
+                txtthanhtien.setText(Handler.formatMoney(Handler.getTotalMoneySelected(cart)));
             }
         });
 
-        txtthanhtien.setText(APIhandler.getFormatTotalMoneySelected(cart));
+        txtthanhtien.setText(Handler.getFormatTotalMoneySelected(cart));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void onActionChecked() {
         cart.forEach(es -> es.setSelect(checkall.isChecked()));
         adapter.notifyDataSetChanged();
-        txtthanhtien.setText(APIhandler.formatMoney(APIhandler.getTotalMoneySelected(cart)));
+        txtthanhtien.setText(Handler.formatMoney(Handler.getTotalMoneySelected(cart)));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void onActionBuy() {
-
-        boolean canbuy = (cart.stream().filter(Order::isSelect).count() != 0);
-
-        //Neu chua dang nhap thi nguoi dung phai dang nhap
-        if (MainActivity.validUser() == 0) {
-            Intent intent = new Intent(CartActivity.this, LoginActivity.class);
-            intent.setAction(ACTION_LOGIN);
-            startActivityForResult(intent, RQ_CHANGE_DATA);
-        } else
+        /**
+         * Neu da dang nhap goi den vao activity mua hang
+         * Neu chua dangg nhap yeu cau dang nhap
+         */
+        if (!MainActivity.getUser().isLogin()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, REQUEST_LOGIN_ORDER);
+        } else {
+            boolean canbuy = (MainActivity.getCart().stream().filter(Order::isSelect).count() != 0);
 
             //Xem xét nếu có thể và không thể mua hàng
             if (!canbuy) {
@@ -118,19 +129,22 @@ public class CartActivity extends AppCompatActivity {
                 Toast.makeText(CartActivity.this.getBaseContext(), text, Toast.LENGTH_SHORT).show();
             } else {
                 startActivityForResult(new Intent(CartActivity.this, OrderActivity.class)
-                        , 10);
+                        , REQUEST_CHANGE_DATA);
             }
+        }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
+        MainActivity.getCart().forEach(e -> e.setSelect(true));
         cart = MainActivity.getCart();
         adapter = new CartAdapter(CartActivity.this, cart);
         listview.setAdapter(adapter);
-
         db = MainActivity.getDatabaseInstence();
         checkall = findViewById(R.id.ckSelAll);
         if (cart.size() != 0)
             checkall.setChecked(true);
+
     }
 
     private void elementMaping() {
@@ -156,20 +170,19 @@ public class CartActivity extends AppCompatActivity {
         switch (id) {
             case R.id.item_delete: {
                 //Tính tổng số lượng sản phẩm  được chọn có trong giỏ hàng
-                int count = cart.stream().filter(Order::isSelect)
+                int count = cart.stream().filter(x->!x.isSelect())
                         .mapToInt(Order::getAmount).sum();
 
-                if (MainActivity.validUser() == 0)
-                    deleteOnLocalDatabase(count);
-                else
+                if (MainActivity.getUser().isLogin())
                     deleteOnServer(count);
-
-                txtthanhtien.setText(APIhandler.getFormatTotalMoneySelected(cart));
+                else
+                    deleteOnLocalDatabase(count);
+                txtthanhtien.setText(Handler.getFormatTotalMoneySelected(cart));
                 return true;
             }
 
             case R.id.item_selall: {
-                cart.forEach(e -> e.setSelect(true));
+                cart.forEach(e -> e.setSelect(false));
                 adapter.notifyDataSetChanged();
                 return true;
             }
@@ -192,21 +205,12 @@ public class CartActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this).
                     setTitle("Xoá").setMessage(message)
                     .setNegativeButton("Có", (e, mid) -> {
-                        int index = 0, delete = 0;
-                        List<Order> arrList = new ArrayList<>();
+                        int index = 0;
+                        List<Order> arrList = cart.stream().filter(x->!x.isSelect()).collect(Collectors.toList());
 
-                        for (Order item : cart) {
-                            if (item.isSelect()) {
-                                delete = db.deleleOrder(item.getId());
-
-                                if(delete > 0){
-                                    arrList.add(item);
-                                    index++;
-                                }
-                            }
-                        }
-
-                        adapter.getOrderList().removeAll(arrList);
+                        MainActivity.getDatabaseInstence()
+                                .deleteOrders(arrList);
+                        cart.removeAll(arrList);
                         adapter.notifyDataSetChanged();
                         Database.print("Delete count=" + index + "\t\t size=" + cart.size());
                     }).setPositiveButton("Không", null);
@@ -221,16 +225,41 @@ public class CartActivity extends AppCompatActivity {
         } else {
             String message = "Bạn có muốn xóa " + count + " sản phẩm ra khỏi giỏ hàng không?";
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this).
-                    setTitle("Xoá").setMessage(message)
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle("Xoá").setMessage(message)
                     .setNegativeButton("Có", (e, mid) -> {
-                        cart.removeIf(Order::isSelect);
-                        adapter.notifyDataSetChanged();
-                        Toast.makeText(CartActivity.this,
-                                "Đã xóa " + count + " sản phẩm", Toast.LENGTH_SHORT).show();
+                        List<Integer> delids = cart.stream().filter(x->!x.isSelect())
+                                .mapToInt(Order::getId)
+                                .boxed()
+                                .collect(Collectors.toList());
+
+                        BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
+                        Call<ResponseBody> call = service.deleteOrder(MainActivity.getUser().getId(), delids);
+
+                        call.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                try {
+                                    JsonObject json = Handler.convertToJSon(response.body().string());
+                                    if (response.isSuccessful() && json.has(MainActivity.MESSAGE)) {
+                                        Toast.makeText(CartActivity.this,
+                                                "Đã xóa " + count + " sản phẩm", Toast.LENGTH_SHORT).show();
+                                        cart.removeIf(e->delids.contains(e.getId()));
+                                        adapter.notifyDataSetChanged();
+                                    } else
+                                        LoginActivity.showToast(getBaseContext(), json.get(MainActivity.ERROR).getAsString());
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                Toast.makeText(CartActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }).setPositiveButton("Không", null);
             builder.show();
-            adapter.notifyDataSetChanged();
         }
     }
 

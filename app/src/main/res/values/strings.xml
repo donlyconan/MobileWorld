@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Mobile World</string>
+    <string name="app_name">Nothing</string>
     <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -7,12 +7,13 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_password">Password must be 5 characters</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="facebook_app_id">239186267278436</string>
-    <string name="fb_login_protocol_scheme">fb239186267278436</string>
+    <string name="facebook_app_id">560329844895295</string>
+    <string name="fb_login_protocol_scheme">fb560329844895295</string>
     <string name="username">Tên đăng nhập</string>
     <string name="take">message</string>
-
-
+    <string name="delivery">Đang vận chuyển</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_tester">Map</string>
 </resources>

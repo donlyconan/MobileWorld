@@ -14,30 +14,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
-import com.team.mobileworld.activity.Animation;
 import com.team.mobileworld.activity.MainActivity;
 import com.team.mobileworld.activity.ProductDetail;
-import com.team.mobileworld.core.object.Order;
+import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.object.Product;
+import com.team.mobileworld.core.task.OnItemClickListener;
+import com.team.mobileworld.core.task.ViewHolder;
+import com.team.mobileworld.core.task.Worker;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
-import maes.tech.intentanim.CustomIntent;
-
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHolder> {
-
-    MainActivity activity;
-    List<Product> productList;
+    private OnItemClickListener listener;
+    private Activity activity;
+    private List<Product> productList;
+    private Worker worker;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public ProductAdapter(Activity activity, List<Product> productList) {
-        this.activity = (MainActivity) activity;
+        this.activity = activity;
         this.productList = productList;
-        productList.removeIf(e->e.getSlmax() <= 0);
     }
+
 
     //khoi tao lai view ma da thiet ke layout o ben ngoai
     @NonNull
@@ -45,7 +45,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
     public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_productnewest, null);
         ItemHolder holder = new ItemHolder(v);
-        Log.d("productinfo", parent.getMeasuredHeight() + " : +" + parent.getMeasuredWidth());
         return holder;
     }
 
@@ -55,25 +54,31 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
         Product product = productList.get(position);
         holder.txtNameProduct.setText(product.getName());
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-        holder.txtPriceProduct.setText("Giá : " + decimalFormat.format(product.getPrice()) + " Đ");
+        holder.txtPriceProduct.setText("Giá : " + decimalFormat.format(product.getPrice()) + " đ");
 
         //Load anh tu URL
-        Picasso.get().load(product.getImage())
-                .placeholder(R.drawable.no_image_icon)
-                .error(R.drawable.error)
-                .fit()
-                .into(holder.imgProduct);
-
+        Handler.loadImage(activity, product.getImage(), holder.imgProduct);
 
         //Chay activity thong tin chi tiet san pham
         holder.view.setOnClickListener(e->{
             Intent intent = new Intent(activity, ProductDetail.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setAction(MainActivity.MAIN_OPEN_ORDER);
-            intent.putExtra("thongtin", productList.get(position));
-            activity.startActivityForResult(intent, ProductDetail.REPLACE_SIZE);
-            CustomIntent.customType(activity, Animation.LEFT_TO_RIGHT);
-         });
+            intent.putExtra(ProductDetail.SAN_PHAM, product);
+            activity.startActivityForResult(intent, ProductDetail.REQUEST_SIZE_AMOUNT);
+        });
+    }
+
+    public List<Product> getProductList() {
+        return productList;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener)
+    {
+        this.listener = listener;
+    }
+
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
     }
 
     @Override
@@ -81,7 +86,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
         return productList.size();
     }
 
-    public class ItemHolder extends RecyclerView.ViewHolder {
+    public void setWorker(Worker worker) {
+        this.worker = worker;
+    }
+
+    public class ItemHolder extends ViewHolder {
         public View view;
         public ImageView imgProduct;
         public TextView txtNameProduct, txtPriceProduct;
@@ -94,4 +103,5 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
             txtPriceProduct = itemView.findViewById(R.id.txtproductprice);
         }
     }
+
 }

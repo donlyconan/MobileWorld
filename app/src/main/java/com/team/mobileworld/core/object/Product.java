@@ -5,115 +5,133 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Product implements Serializable {
-	/**
-	 * 
-	 */
-	public  static  final int LSP_PHONE = 1;
-	public  static  final int LSP_LAPTOP = 2;
+    /**
+     *
+     */
+    public static final int LSP_PHONE = 1;
+    public static final int LSP_LAPTOP = 2;
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@SerializedName("id")
-	@Expose
-	private int id;
-	@SerializedName("name")
-	@Expose
-	private String name;
-	@SerializedName("price")
-	@Expose
-	private Integer price;
-	@SerializedName("image")
-	@Expose
-	private String image;
-	@SerializedName("description")
-	@Expose
-	private String description;
-	@SerializedName("categoryid")
-	@Expose
-	private int categoryid;
-	@SerializedName("slmax")
-	@Expose
-	private int slmax;
+    @SerializedName("id")
+    @Expose
+    private int id;
+    @SerializedName("name")
+    @Expose
+    private String name;
+    @SerializedName("price")
+    @Expose
+    private Integer price;
+    @SerializedName("pictureuri")
+    @Expose
+    private String image;
+    @SerializedName("description")
+    @Expose
+    private String description;
+    @SerializedName("catalogtypeid")
+    @Expose
+    private int categoryid;
+    @SerializedName("quantity")
+    @Expose
+    private int slmax;
 
-	public Product(int id, String name, Integer price, String image, String description, int categoryid) {
-		this.id = id;
-		this.name = name;
-		this.price = price;
-		this.image = image;
-		this.description = description;
-		this.categoryid = categoryid;
-	}
+    public Product(int id, String name, Integer price, String image, String description, int categoryid) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.image = image;
+        this.description = description;
+        this.categoryid = categoryid;
+    }
 
-	public Product(int id, String name, Integer price, String image, String description, int categoryid, int slmax) {
-		this.id = id;
-		this.name = name;
-		this.price = price;
-		this.image = image;
-		this.description = description;
-		this.categoryid = categoryid;
-		this.slmax = slmax;
-	}
+    public Product(int id, String name, Integer price, String image, String description, int categoryid, int slmax) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.image = image;
+        this.description = description;
+        this.categoryid = categoryid;
+        this.slmax = slmax;
+    }
 
-	private boolean isSmartphone() {
-		return categoryid == 1;
-	}
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", image='" + image + '\'' +
+                ", description='" + description + '\'' +
+                ", categoryid=" + categoryid +
+                ", slmax=" + slmax +
+                '}';
+    }
 
-	public int getId() {
-		return id;
-	}
+    private boolean isSmartphone() {
+        return categoryid == 1;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public int getPrice() {
-		return price;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setPrice(Integer price) {
-		this.price = price;
-	}
+    public int getPrice() {
+        return price;
+    }
 
-	public String getImage() {
-		return image;
-	}
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
 
-	public void setImage(String image) {
-		this.image = image;
-	}
+    public String getImage() {
+        return image;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setImage(String image) {
+        this.image = image;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public int getCategoryid() {
-		return categoryid;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setCategoryid(int categoryid) {
-		this.categoryid = categoryid;
-	}
+    public int getCategoryid() {
+        return categoryid;
+    }
 
-	public int getSlmax() {
-		return slmax;
-	}
+    public void setCategoryid(int categoryid) {
+        this.categoryid = categoryid;
+    }
 
-	public void setSlmax(int slmax) {
-		this.slmax = slmax;
-	}
+    public int getSlmax() {
+        return slmax;
+    }
+
+    public void setSlmax(int slmax) {
+        this.slmax = slmax;
+    }
 
 
 }

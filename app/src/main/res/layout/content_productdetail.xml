@@ -66,8 +66,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
-                android:textColor="#333131"
                 android:text="Số lượng tồn: 120 sản phẩm"
+                android:textColor="#333131"
                 android:textSize="15sp" />
 
             <LinearLayout

@@ -28,5 +28,9 @@
         <item name="android:textColorPrimary">@color/iron</item>
         <item name="android:background">@color/primary</item>
     </style>
+    
+    <style name="colormenu" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@color/yellow</item>
+    </style>
 
 </resources>

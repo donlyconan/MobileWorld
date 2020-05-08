@@ -7,19 +7,22 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ItemList implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class CatalogItem implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	@SerializedName("title") @Expose
+    @SerializedName("title")
+    @Expose
     private String title;
 
-    @SerializedName("products") @Expose
+    @SerializedName("product")
+    @Expose
     private List<Product> products;
 
-    @SerializedName("mode") @Expose
+    @SerializedName("mode")
+    @Expose
     private int mode;
 
-    public ItemList(String title, List<Product> products, int mode) {
+    public CatalogItem(String title, List<Product> products, int mode) {
         this.title = title;
         this.products = products;
         this.mode = mode;
@@ -49,5 +52,5 @@ public class ItemList implements Serializable {
         this.mode = mode;
     }
 
-    
+
 }

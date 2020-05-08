@@ -1,5 +1,6 @@
 package com.team.mobileworld.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -7,9 +8,11 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,39 +20,62 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.JsonObject;
 import com.team.mobileworld.R;
 import com.team.mobileworld.adapter.OrderApdater;
-import com.team.mobileworld.core.handle.APIhandler;
+import com.team.mobileworld.core.NetworkCommon;
+import com.team.mobileworld.core.handle.Handler;
+import com.team.mobileworld.core.handle.Validate;
 import com.team.mobileworld.core.object.Order;
-import com.team.mobileworld.core.object.Product;
 import com.team.mobileworld.core.object.User;
+import com.team.mobileworld.core.service.BasketService;
+import com.team.mobileworld.core.task.Worker;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import maes.tech.intentanim.CustomIntent;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.team.mobileworld.activity.MainActivity.RQ_OPEN_LOGIN;
+import static com.team.mobileworld.activity.MainActivity.getCart;
 
 public class OrderActivity extends AppCompatActivity {
-    public static final String Inte = "AC_OPEN_EDIT_ADD";
     private static final int REQUEST_PERSON = 10;
+    private static final int REQUEST_ADDRESS = 11;
 
     OrderApdater apdater;
     RecyclerView recycler;
     List<Order> list;
-    TextView txtTStien, txtTSpham, txtTTien, txtname, txtinfo;
-    EditText txtaddress;
+    TextView txtTStien, txtTSpham, txtTTien;
+    EditText inpname, inpaddress;
     Button btnDhang;
     ImageButton btnedit;
     Toolbar toolbar;
     List<Order> cart;
+    ImageView imgaddress;
+    ProgressDialog dialog;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_PERSON && resultCode == REQUEST_PERSON) {
-            String address = data.getExtras().getString("address");
-            txtaddress.setText(address);
+        if (requestCode == REQUEST_PERSON && resultCode == RESULT_OK) {
+            User user = MainActivity.getUser();
+            String line = String.format("%s | %s", get(user.getFullname()), get(user.getPnumber()));
+            inpname.setText(line);
+            inpaddress.setText(get(user.getAddress()));
+        }
+
+        if (requestCode == REQUEST_ADDRESS && resultCode == RESULT_OK) {
+            inpaddress.setText(MapsActivity.Address);
         }
     }
 
@@ -71,6 +97,15 @@ public class OrderActivity extends AppCompatActivity {
 
         //Xu ly su kien
         toolbar.setNavigationOnClickListener(e -> finish());
+
+        imgaddress.setOnClickListener(e -> onActionOpenMap());
+
+
+    }
+
+    private void onActionOpenMap() {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivityForResult(intent, REQUEST_ADDRESS);
     }
 
     private void startPersonalInfo() {
@@ -79,23 +114,108 @@ public class OrderActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_PERSON);
     }
 
-    private void onActionOrder() {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void onActionOrder() {
         User user = MainActivity.getUser();
+        String fullname = inpname.getText().toString();
+        String address = inpaddress.getText().toString();
 
-        //Kiem tra so dien thoai nguoi nhan
-        if (MainActivity.validUser() == MainActivity.STATUS_LOGIN_NOT_PHONE) {
-            Intent intent = new Intent(OrderActivity.this, PersonalInfoActivity.class);
-            intent.setAction(Intent.ACTION_EDIT);
-            startActivityForResult(intent, REQUEST_PERSON);
-        } else
-            //Kiem tra gio hang
-            if (list.size() <= 0) {
-                Toast.makeText(OrderActivity.this, "Vui lòng chọn mua sản phẩm trước khi đặt hàng.", Toast.LENGTH_SHORT).show();
-            } else {
-                cart.removeAll(list);
-                Toast.makeText(OrderActivity.this, "Đặt hàng thàng công", Toast.LENGTH_SHORT).show();
-                finish();
+//        Kiem tra so dien thoai nguoi nhan
+        if (user.isLogin() && user.hasPhoneNumber() && user.hasAddress()) {
+            BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
+
+            dialog.show();
+            final List<Integer> idorders = list.stream().map(Order::getId).collect(Collectors.toList());
+
+            Worker worker = () -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("shiptoaddress", inpaddress.getText().toString());
+                map.put("idorders", idorders);
+                Call<ResponseBody> call = service.orderedList(user.getId(), map);
+
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            try {
+                                JsonObject json = Handler.convertToJSon(response.body().string());
+                                if (json.has(MainActivity.MESSAGE)) {
+                                    MainActivity.getCart().removeIf(Order::isSelect);
+                                    Toast.makeText(OrderActivity.this, json.get(MainActivity.MESSAGE).getAsString(), Toast.LENGTH_SHORT).show();
+                                    //Tra ve ok neu dat hang thanh cong
+                                    setResult(RESULT_OK);
+                                    finish();
+                                } else {
+                                    LoginActivity.showToast(getBaseContext(), json.get(MainActivity.ERROR).getAsString());
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            Toast.makeText(OrderActivity.this, "Không thể đặt thêm hàng do sản phẩm hiện đang được xét duyệt!", Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(OrderActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+            };
+
+            if (ProductDetail.BUY_GOODS_NOW == getIntent().getAction()) {
+                Order item = list.get(0);
+                idorders.clear();
+                idorders.add(item.getId());
+                addProductOnCart(item.getId(), item.getAmount(), worker);
+            } else
+                worker.hanlde();
+        } else {
+            Intent intent = new Intent(this, PersonalInfoActivity.class);
+            startActivityForResult(intent, RQ_OPEN_LOGIN);
+        }
+
+    }
+
+    @MainThread
+    public void addProductOnCart(int catalogid, int amount, Worker worker) {
+        Call<ResponseBody> call = NetworkCommon.getRetrofit()
+                .create(BasketService.class)
+                .addOrder(MainActivity.getUser().getId(), catalogid, amount);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful())
+                    worker.hanlde();
+                else
+                    LoginActivity.showToast(getBaseContext(), "Lỗi giao dịch có thể do trùng đơn hàng!");
+                dialog.dismiss();
             }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                LoginActivity.showToast(getBaseContext(), t.getMessage());
+                dialog.dismiss();
+            }
+        });
+
+    }
+
+
+    private boolean validate(String fullname, String address, String sdt) {
+        boolean valid = true;
+        if (!Validate.valid(fullname, Validate.REGEX_NAME)) {
+            inpname.setError("Tên không hợp lệ");
+            valid = false;
+        }
+        if (!Validate.valid(address, Validate.REGEX_ADDRESS)) {
+            inpaddress.setError("Địa chỉ không hợp lệ");
+            valid = false;
+        }
+        return valid;
     }
 
 
@@ -106,44 +226,50 @@ public class OrderActivity extends AppCompatActivity {
         getDataFromIntent();
 
         final User user = MainActivity.getUser();
-        cart = MainActivity.getCart();
+        cart = getCart();
 
-        if (user != null) {
-            txtinfo.setText(PersonalInfoActivity.get(user.getFullname()) + " | " + PersonalInfoActivity.get(user.getPnumber()));
-            txtaddress.setText(user.getAddress());
+        if (MainActivity.getUser() != null) {
+            String line = String.format("%s | %s", user.getFullname(), user.getPnumber());
+            inpname.setText(line);
+            inpaddress.setText(user.getAddress());
         } else {
-            txtinfo.setText("");
-            txtaddress.setFocusable(true);
-            txtaddress.requestFocus();
+            inpname.findFocus();
         }
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Đang xử lý...");
+        dialog.setCancelable(false);
+        dialog.setIndeterminate(true);
+
         //cai dat thuoc tinh
-        txtTSpham.setText("Tổng số (" + APIhandler.getTotalAmount(list) + " sản phầm):");
-        String ThanhTien = APIhandler.formatMoney(APIhandler.getTotalMoney(list));
+        txtTSpham.setText("Tổng số (" + Handler.getTotalAmount(list) + " sản phầm):");
+        String ThanhTien = Handler.formatMoney(Handler.getTotalMoney(list));
         txtTStien.setText(ThanhTien);
         txtTTien.setText(ThanhTien);
     }
 
     private void elementMapping() {
+        inpname = findViewById(R.id.inp_fullname);
+        inpaddress = findViewById(R.id.inp_address);
         txtTSpham = findViewById(R.id.txtTSpham);
         txtTStien = findViewById(R.id.txtTStien);
         txtTTien = findViewById(R.id.txtTTien);
-        txtaddress = findViewById(R.id.txtaddress);
-        txtname = findViewById(R.id.txtname);
         toolbar = findViewById(R.id.toolbar);
         recycler = findViewById(R.id.recycle_view);
         btnDhang = findViewById(R.id.btnbuy);
-        txtinfo = findViewById(R.id.txtinfoname);
         btnedit = findViewById(R.id.btnedit);
+        imgaddress = findViewById(R.id.imgaddress);
     }
 
+    public static String get(String a){
+        return  a == null ? "" : a;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getDataFromIntent() {
         if (getIntent().getAction() == ProductDetail.BUY_GOODS_NOW) {
-            list = new ArrayList<>();
-            list.add((Order) getIntent().getExtras().get("item"));
+            list = Arrays.asList((Order) getIntent().getExtras().get("item"));
         } else {
-            list = APIhandler.getProductSeleted(cart);
+            list = Handler.getProductSeleted(getCart());
         }
         apdater = new OrderApdater(this, list);
         Log.d("SIZE", list.size() + "");
@@ -167,6 +293,37 @@ public class OrderActivity extends AppCompatActivity {
         super.finish();
         CustomIntent.customType(this, Animation.RIGHT_TO_LEFT);
     }
+
+
+//    private void onShowAlertInfo() {
+//        View view = getLayoutInflater().inflate(R.layout.alert_address, null);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                .setView(view);
+//
+//        Button btnhoantat = view.findViewById(R.id.btnhoantat);
+//        Button btnhuybo = view.findViewById(R.id.btnhuybo);
+//
+//        EditText inpname = view.findViewById(R.id.inp_fullname);
+//        EditText inpsdt = view.findViewById(R.id.inp_sdt);
+//        EditText inpaddress = view.findViewById(R.id.inp_address);
+//        final AlertDialog close = builder.show();
+//
+//
+//        btnhoantat.setOnClickListener(e -> {
+//            String fullname = inpname.getText().toString();
+//            String sdt = inpsdt.getText().toString();
+//            String address = inpaddress.getText().toString();
+//
+//            if (validate(fullname, address, sdt)) {
+//                final User user = new User(1000000000L, fullname, null, null, null, null, 0, address, sdt);
+//
+//
+//                close.dismiss();
+//            }
+//        });
+//
+//        btnhuybo.setOnClickListener(e -> close.dismiss());
+//    }
 
 
 }

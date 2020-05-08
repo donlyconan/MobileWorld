@@ -1,30 +1,32 @@
 package com.team.mobileworld.activity;
 
+import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.widget.Adapter;
-import android.widget.ImageButton;
-import android.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.team.mobileworld.R;
 import com.team.mobileworld.adapter.OrderApdater;
 import com.team.mobileworld.core.NetworkCommon;
-import com.team.mobileworld.core.handle.ValidNetwork;
 import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.User;
 import com.team.mobileworld.core.service.BillService;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import maes.tech.intentanim.CustomIntent;
 import retrofit2.Call;
@@ -32,12 +34,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BillActivity extends AppCompatActivity {
+    private List<Order> list;
+    private OrderApdater adapter;
 
-    ImageButton btnback;
+    TabLayout tabLayout;
     SearchView search;
     RecyclerView recycler;
-    private List<Order> list;
-    OrderApdater adapter;
+    Toolbar toolbar;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -48,85 +51,150 @@ public class BillActivity extends AppCompatActivity {
         //Anhxa phan tu
         elemetMapping();
 
-        //Cau hinh doi tuong
-        init();
+        tabLayout.setOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                getCurrentDatas();
+            }
 
-        //su kien quay tro lai
-        btnback.setOnClickListener(e -> finish());
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                getCurrentDatas();
+            }
+        });
 
         //Lay du lieu tren server
-        loadDataFromServer();
+        getCurrentDatas();
 
         //Thuc hien searh
-        onActionSearch();
+
+//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.N)
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                List<Order> filList = null;
+//                switch (position) {
+//                    case 0:
+//                        filList = list.stream().filter(e -> e.getStatus() == Order.STATUS_DELIVRY).collect(Collectors.toList());
+//                        adapter.setList(filList);
+//                        break;
+//                    case 1:
+//                        filList = list.stream().filter(e -> e.getStatus() == Order.STATUS_RECEIVE).collect(Collectors.toList());
+//                        adapter.setList(filList);
+//                        break;
+//                    case 2:
+//                        adapter.setList(list);
+//                        break;
+//
+//                    default:
+//                        break;
+//                }
+//                adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+    }
+
+    public void getCurrentDatas() {
+        int index = tabLayout.getSelectedTabPosition();
+
+        switch (index) {
+            case 0:
+                loadDataFromServer(Order.STATUS_CONFIRM);
+                break;
+            case 1:
+                loadDataFromServer(Order.STATUS_DELIVRY);
+                break;
+            case 2:
+                loadDataFromServer(Order.STATUS_RECEIVE);
+                break;
+            case 3:
+                loadDataFromServer(Order.STATUS_CANCLE);
+                break;
+        }
+
     }
 
 
-    private void init() {
-        list = new ArrayList<>();
-        adapter = new OrderApdater(this, list);
-
-        recycler.setLayoutManager(new LinearLayoutManager(this));
+    private void elemetMapping() {
+        toolbar = findViewById(R.id.toolbar);
+        tabLayout = findViewById(R.id.tabs_layout);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(e -> finish());
+        recycler = findViewById(R.id.recycle_view);
+        list = new ArrayList<>(50);
+        adapter = new OrderApdater(this, list, OrderApdater.ITEM_BILL_VIEW);
+        recycler.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         recycler.setAdapter(adapter);
     }
 
-    private void elemetMapping() {
-        btnback = findViewById(R.id.btn_back);
-        recycler = findViewById(R.id.recycler);
-        search = findViewById(R.id.search_bar);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_bill, menu);
+        MenuItem item = menu.findItem(R.id.it_search_bar);
+        search = (SearchView) item.getActionView();
+        SearchManager manager = (SearchManager) getSystemService(SEARCH_SERVICE);
+        search.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+        onActionSearch();
+        return super.onCreateOptionsMenu(menu);
     }
 
-    void  loadDataFromServer(){
-        if(ValidNetwork.hasNetwork(this))
-        {
-            User user = MainActivity.getUser();
-            //Thiet lap service
-            BillService service = NetworkCommon.getRetrofit().create(BillService.class);
+    void loadDataFromServer(int status) {
+        User user = MainActivity.getUser();
+        //Thiet lap service
+        BillService service = NetworkCommon.getRetrofit().create(BillService.class);
 
-            Call<List<Order>> call = service.loadBill(user.getId());
+        Call<List<Order>> call = service.loadBill(user.getId(), status);
 
-            call.enqueue(new Callback<List<Order>>() {
-                @Override
-                public void onResponse(Call<List<Order>> call, Response<List<Order>> response) {
-                    list = response.body();
+        call.enqueue(new Callback<List<Order>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onResponse(Call<List<Order>> call, Response<List<Order>> response) {
+                list = response.body();
+                if (response.isSuccessful() && list != null) {
                     adapter.setList(list);
                     adapter.notifyDataSetChanged();
-                }
+                } else
+                    LoginActivity.showToast(getBaseContext(), "Lỗi tải dữ liệu!");
+            }
 
-                @Override
-                public void onFailure(Call<List<Order>> call, Throwable t) {
-                    Toast.makeText(BillActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            AlertDialog builder = new AlertDialog.Builder(this)
-                    .setTitle(MainActivity.APP_NAME)
-                    .setMessage("Không có kết nối Internet")
-                    .show();
-            builder.show();
-        }
+            @Override
+            public void onFailure(Call<List<Order>> call, Throwable t) {
+                Toast.makeText(BillActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void onActionSearch() {
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(list.size() == 0){
+                if (list.size() == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(BillActivity.this)
-                            .setTitle(MainActivity.APP_NAME)
+                            .setTitle(R.string.app_name)
                             .setMessage("Danh sách trống")
                             .setPositiveButton("OK", null);
                     builder.show();
                 }
-
                 return true;
             }
 
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean onQueryTextChange(String newText) {
-                List<Order> newList = new ArrayList<>();
-                list.stream().filter(e -> e.getName().contains(newText)).forEach(newList::add);
+                List<Order> newList = list.stream().filter(e -> e.getName()
+                        .toLowerCase().contains(newText.toLowerCase())
+                        || (e.getId() + "").equals(newText)).collect(Collectors.toList());
                 adapter.setList(newList);
                 adapter.notifyDataSetChanged();
                 return true;

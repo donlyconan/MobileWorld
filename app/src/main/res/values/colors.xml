@@ -5,6 +5,7 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="colorForeign">#FF8043D8</color>
     <color name="colorToolbar">#5c2d90</color>
+    <color name="colorcantcancle">#8F8F8F</color>
 
     <color name="primary">#E43F3F</color>
     <color name="primary_dark">#E12929</color>
@@ -20,4 +21,8 @@
     <color name="base">#AAAAAA</color>
     <color name="iron">#CCCCCC</color>
     <color name="white">#FFFFFF</color>
+    <color name="money">#EE1C18</color>
+    <color name="yellow">#FDD835</color>
+    <color name="textColor">#505050</color>
+    <color name="info">#449DE9</color>
 </resources>

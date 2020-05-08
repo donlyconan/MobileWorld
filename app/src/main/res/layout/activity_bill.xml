@@ -1,33 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activity.ResultSearchActivity">
+    android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar_result_search"/>
-
-    <TextView
-        android:id="@+id/search_bar"
-        android:text="Danh sách hàng hóa"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:background="#fff"
         android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:textColor="#000"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Đơn hàng"
+            app:titleTextColor="#fff"
+            android:background="@color/colorToolbar"
+            app:navigationIcon="@drawable/ic_back"
+            android:theme="@style/colormenu"
+            app:popupTheme="@menu/menu"
+            app:menu="@menu/menu_bill"
+            app:layout_scrollFlags="scroll|enterAlways">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler"
+        </androidx.appcompat.widget.Toolbar>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabTextColor="#000"
+            app:tabIndicatorHeight="1sp"
+            app:tabIndicatorColor="#E53935"
+            app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
+            app:tabSelectedTextColor="#F4511E"
+            app:tabMode="scrollable">
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabconfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chờ xác nhận" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabdelivery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đang giao hàng"  />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabreceive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đã giao hàng"
+                />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabcancle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đã hủy" />
+        </com.google.android.material.tabs.TabLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_weight="1"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
+     <LinearLayout
+         android:descendantFocusability="blocksDescendants"
+         android:clickable="false"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:padding="3dp"
+         android:layout_height="match_parent">
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/recycle_view"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"/>
+     </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
