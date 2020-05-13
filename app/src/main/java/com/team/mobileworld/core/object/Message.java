@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class Message {
     @SerializedName("billid") @Expose
-    private int id;
+    private int id = -1;
     @SerializedName("title") @Expose
     private String title;
     @SerializedName("content") @Expose

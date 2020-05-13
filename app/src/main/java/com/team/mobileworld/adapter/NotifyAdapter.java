@@ -1,12 +1,14 @@
 package com.team.mobileworld.adapter;
 
 import android.app.Activity;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.team.mobileworld.R;
@@ -16,10 +18,12 @@ import com.team.mobileworld.core.task.ViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
 
 public class NotifyAdapter extends RecyclerView.Adapter<NotifyAdapter.ItemHolder> {
     private Activity activity;
     private List<Message> list;
+    private TextView watherview;
     private OnItemClickListener onItemClickListener;
 
     public NotifyAdapter(Activity activity, List<Message> list) {
@@ -40,9 +44,11 @@ public class NotifyAdapter extends RecyclerView.Adapter<NotifyAdapter.ItemHolder
         Message item = list.get(position);
         holder.txttitle.setText(item.getTitle());
         holder.txtcotent.setText(item.getContent());
-
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         holder.txtdate.setText(format.format(item.getDate()));
+
+        if (item.getId() == -1)
+            Linkify.addLinks(holder.txtcotent, Linkify.WEB_URLS);
     }
 
     public List<Message> getList() {
@@ -59,6 +65,10 @@ public class NotifyAdapter extends RecyclerView.Adapter<NotifyAdapter.ItemHolder
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public TextView getWatherview() {
+        return watherview;
     }
 
     @Override

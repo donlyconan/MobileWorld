@@ -1,5 +1,8 @@
 package com.team.mobileworld.activity;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
@@ -17,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,10 +33,13 @@ import com.team.mobileworld.core.handle.Validate;
 import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.User;
 import com.team.mobileworld.core.service.BasketService;
+import com.team.mobileworld.core.service.BillService;
 import com.team.mobileworld.core.task.Worker;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +57,7 @@ import static com.team.mobileworld.activity.MainActivity.getCart;
 public class OrderActivity extends AppCompatActivity {
     private static final int REQUEST_PERSON = 10;
     private static final int REQUEST_ADDRESS = 11;
+    private static final int ID_NOTIFICATION = 100;
 
     OrderApdater apdater;
     RecyclerView recycler;
@@ -62,6 +70,7 @@ public class OrderActivity extends AppCompatActivity {
     List<Order> cart;
     ImageView imgaddress;
     ProgressDialog dialog;
+    Call<ResponseBody> callorder;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -86,7 +95,7 @@ public class OrderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order);
 
         //Anh xa phan tu
-        elementMapping();
+        mapping();
 
         //Cai dat hien thi
         init();
@@ -127,13 +136,24 @@ public class OrderActivity extends AppCompatActivity {
             dialog.show();
             final List<Integer> idorders = list.stream().map(Order::getId).collect(Collectors.toList());
 
+            /**
+             * Tao thong bao day cho ung dung
+             */
+            Intent intent = new Intent(this, BillActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,0, intent, 0);
+            final Notification noti = Handler.createNotificationChannel(this,pendingIntent
+            , "Đặt hàng thành công!", "Bạn đã một đơn hàng, lúc "
+                            + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()) +
+                            "hãy vào đơn mua để theo cập nhật thông tin sản phẩm sớm nhất.");
+            final NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
             Worker worker = () -> {
                 Map<String, Object> map = new HashMap<>();
                 map.put("shiptoaddress", inpaddress.getText().toString());
                 map.put("idorders", idorders);
-                Call<ResponseBody> call = service.orderedList(user.getId(), map);
+                callorder = service.orderedList(user.getId(), map);
 
-                call.enqueue(new Callback<ResponseBody>() {
+                callorder.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
@@ -143,6 +163,7 @@ public class OrderActivity extends AppCompatActivity {
                                     MainActivity.getCart().removeIf(Order::isSelect);
                                     Toast.makeText(OrderActivity.this, json.get(MainActivity.MESSAGE).getAsString(), Toast.LENGTH_SHORT).show();
                                     //Tra ve ok neu dat hang thanh cong
+                                    manager.notify(0, noti);
                                     setResult(RESULT_OK);
                                     finish();
                                 } else {
@@ -247,7 +268,7 @@ public class OrderActivity extends AppCompatActivity {
         txtTTien.setText(ThanhTien);
     }
 
-    private void elementMapping() {
+    private void mapping() {
         inpname = findViewById(R.id.inp_fullname);
         inpaddress = findViewById(R.id.inp_address);
         txtTSpham = findViewById(R.id.txtTSpham);
@@ -267,7 +288,8 @@ public class OrderActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getDataFromIntent() {
         if (getIntent().getAction() == ProductDetail.BUY_GOODS_NOW) {
-            list = Arrays.asList((Order) getIntent().getExtras().get("item"));
+            Order item = (Order) getIntent().getExtras().get("item");
+            list = Arrays.asList(item);
         } else {
             list = Handler.getProductSeleted(getCart());
         }

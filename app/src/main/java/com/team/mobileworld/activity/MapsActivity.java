@@ -1,9 +1,7 @@
 package com.team.mobileworld.activity;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -19,8 +17,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,10 +29,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.team.mobileworld.R;
 import com.team.mobileworld.core.NetworkCommon;
+import com.team.mobileworld.core.handle.LocationInfo;
 import com.team.mobileworld.core.object.Geocode;
 import com.team.mobileworld.core.object.Place;
 import com.team.mobileworld.core.service.LocationService;
@@ -93,6 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         listView.setOnItemClickListener(OnSelectItem());
+        LocationInfo.register(this);
     }
 
     private void init() {
@@ -129,6 +127,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MainActivity.REQUEST_LOCATION && grantResults.length > 0) {
+            showCurrentLocation();
+        } else {
+            showToast("Không thể truy cập GPS!");
+        }
+    }
+
     public AdapterView.OnItemClickListener OnSelectItem() {
         return new AdapterView.OnItemClickListener() {
             @Override
@@ -139,8 +148,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 servicegeocode = NetworkCommon.buildURL(LocationService.BASE_URL_DEVELOPER_MAPQUEST)
                         .create(LocationService.class)
                         .searchGeocodeLocation(places.get(position).getDescription());
-                final ProgressDialog progressDialog = createProgressDialog("Đang tìm tọa độ");
+                final ProgressDialog progressDialog = createProgressDialog("Đang tìm tọa độ...");
                 servicegeocode.enqueue(new Callback<ResponseBody>() {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
@@ -182,7 +192,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 serviceplaces = NetworkCommon.buildURL(LocationService.BASE_URL_GOOGLE)
                         .create(LocationService.class)
                         .searchPlaceLocation(query);
-                final ProgressDialog progressDialog = createProgressDialog("Đang tìm kiếm");
+                final ProgressDialog progressDialog = createProgressDialog("Đang tìm kiếm...");
                 serviceplaces.enqueue(new Callback<ResponseBody>() {
                     @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
@@ -243,26 +253,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         showAnimateLocationOnMapLatLng(latLng, address.getAddressLine(0));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void getCurrentLocation(Runnable runnable) {
-        if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-        {
-            ProgressDialog progressDialog = createProgressDialog("Đang truy cập...");
-            locationProviderClient.getLastLocation().addOnSuccessListener(x -> {
-                MapsActivity.this.location = x;
-                print("location=" + x);
-                if (x == null)
-                    showToast("Không cập nhật được vị trí hiện tại.");
-                else
-                    runnable.run();
-                progressDialog.dismiss();
-            });
-            progressDialog.show();
-        } else {
-            showToast("Không thể truy cập vào GPS!");
-        }
-
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.M)
+//    public void getCurrentLocation() {
+//        LatLng
+////        if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+////        {
+////            ProgressDialog progressDialog = createProgressDialog("Đang truy cập...");
+////            locationProviderClient.getLastLocation().addOnSuccessListener(x -> {
+////                MapsActivity.this.location = x;
+////                print("location=" + x);
+////                if (x == null)
+////                    showToast("Không cập nhật được vị trí hiện tại.");
+////                else
+////                    runnable.run();
+////                progressDialog.dismiss();
+////            });
+////            progressDialog.show();
+////        } else {
+////            showToast("Không thể truy cập vào GPS!");
+////        }
+//
+//    }
 
     public String getAddress(Address address) {
         String line = "";
@@ -277,10 +288,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         googlemap = googleMap;
-        LatLng latlng = new LatLng(21.02, 105.83);
-        googleMap.clear();
-        showLocationOnMapLatLng(latlng, "Hà nội");
-
         showCurrentLocation();
 
         if (Intent.CATEGORY_OPENABLE == getIntent().getAction()) {
@@ -324,9 +331,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void showCurrentLocation() {
-        Runnable runnable = () -> {
+        LocationInfo.worker = () -> {
             try {
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                googlemap.clear();
+                LatLng latLng = LocationInfo.getLatLng();
                 Address address = new Geocoder(this)
                         .getFromLocation(latLng.latitude, latLng.longitude, 1).get(0);
                 showAnimateLocationOnMapLatLng(latLng, address.getAddressLine(0));
@@ -335,7 +343,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ex.printStackTrace();
             }
         };
-        getCurrentLocation(runnable);
+        LocationInfo.getCurrentLocation();
     }
 
     public void showToast(String message) {

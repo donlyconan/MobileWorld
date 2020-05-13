@@ -16,4 +16,5 @@
     <string name="delivery">Đang vận chuyển</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_tester">Map</string>
+    <string name="appid_weather">20653c9dc554e39770224aa6a8891cb7</string>
 </resources>

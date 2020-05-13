@@ -1,5 +1,9 @@
 package com.team.mobileworld.core.object;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -31,6 +35,7 @@ public class Geocode {
 		this.latlng = latlng;
 	}
 	
+	@RequiresApi(api = Build.VERSION_CODES.N)
 	public static List<Geocode> getListGeocode(ResponseBody response) throws JsonSyntaxException, IOException{
 		List<Geocode> geocodes = new ArrayList<Geocode>(20);
 		JsonObject json = (JsonObject) new JsonParser().parse(response.string());

@@ -1,10 +1,10 @@
 package com.team.mobileworld.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -31,14 +32,13 @@ import com.google.android.material.navigation.NavigationView;
 import com.team.mobileworld.R;
 import com.team.mobileworld.core.NetworkCommon;
 import com.team.mobileworld.core.database.Database;
+import com.team.mobileworld.core.handle.LocationInfo;
 import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.handle.ValidNetwork;
 import com.team.mobileworld.core.object.CatalogItem;
-import com.team.mobileworld.core.object.Message;
 import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.User;
 import com.team.mobileworld.core.service.BasketService;
-import com.team.mobileworld.core.service.NotificationService;
 import com.team.mobileworld.core.service.UserService;
 import com.team.mobileworld.fragment.CustomViewFragement;
 import com.team.mobileworld.fragment.LoadFragement;
@@ -52,6 +52,8 @@ import maes.tech.intentanim.CustomIntent;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.team.mobileworld.core.handle.LocationInfo.getCurrentLocation;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static final String MESSAGE = "message";
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final List<Order> Cart = new ArrayList<>(50);
     private static final long WAIT_TIME = 5000;
+    public static final int REQUEST_LOCATION = 1000;
     private static User user = new User(); //Chua dinh danh user
     private static Database db;
     public static boolean NewLogin = false;
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtSLuong.setText(Handler.getTotalAmount(getCart()) + "");
         if (!fragload.getProgressBar().isIndeterminate())
             loadPageView("home");
+        LocationInfo.register(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
         //Xu ly anh xa id
-        elementMapping();
+        mapping();
 
         //thiet lap co ban
         init();
@@ -177,16 +181,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void init() {
         //Xu ly su kien chuyen doi
         fmanager = getSupportFragmentManager();
-
         //Danh sach cach loai mat hang
         goods = new ArrayList<>();
         fragload = new LoadFragement();
-
         db = new Database(this, CURRENT_VERSION);
+        LocationInfo.register(this);
+        LocationInfo.getCurrentLocation();
     }
 
     //Ánh xạ phẩn tử
-    private void elementMapping() {
+    private void mapping() {
         drawer = findViewById(R.id.drawer_layout);
         txtSLuong = findViewById(R.id.txtSoluong);
         btnNav = findViewById(R.id.btn_nav);
@@ -194,6 +198,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navview = findViewById(R.id.nav_view);
         textsearch = findViewById(R.id.txtsearch);
 
+        String[] permissions = new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION
+                , Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissions, 1000);
+        }
         final View header = navview.getHeaderView(0);
         txtfullname = header.findViewById(R.id.txt_fullname);
         txtemail = header.findViewById(R.id.txt_email);
@@ -342,6 +353,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+
 
     @Override
     public void startActivity(Intent intent) {

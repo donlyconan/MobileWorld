@@ -95,7 +95,7 @@ public class ProductDetail extends AppCompatActivity {
         setContentView(R.layout.activity_product_detail);
 
         //Anh xa phan tu
-        elementMapping();
+        mapping();
 
         init();
 
@@ -135,7 +135,10 @@ public class ProductDetail extends AppCompatActivity {
     }
 
     private void buyProductNow() {
-        if (MainActivity.getUser().isLogin()) {
+        index = Handler.findById(item.getId(), cart);
+        if(index > -1) {
+            LoginActivity.showToast(getBaseContext(), "Đơn hàng đã tồn tại trong giỏ hàng!");
+        } else if (MainActivity.getUser().isLogin()) {
             Order order = new Order(item.getId(), item.getName(), item.getPrice(), item.getImage()
                     , Integer.valueOf(spSluong.getSelectedItem().toString()));
             //Start activity Order
@@ -315,7 +318,7 @@ public class ProductDetail extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_SIZE_AMOUNT);
     }
 
-    private void elementMapping() {
+    private void mapping() {
         toolbarDetail = findViewById(R.id.toolbardetail);
         imgDetail = findViewById(R.id.imgdetail);
         txtNameDetail = findViewById(R.id.txtnamedetail);

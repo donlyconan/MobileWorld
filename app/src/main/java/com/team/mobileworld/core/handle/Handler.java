@@ -1,10 +1,15 @@
 package com.team.mobileworld.core.handle;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.os.Build;
 import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -41,6 +46,25 @@ public class Handler {
                 list.add(0,item);
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public static Notification createNotificationChannel(
+            Activity activity
+            , PendingIntent intent
+            , String title
+            , String content) {
+
+        Notification builder = new Notification.Builder(activity)
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setDefaults(Notification.DEFAULT_SOUND)
+                .setAutoCancel(true)
+                .addAction(R.drawable.ic_notifications, "Open", intent)
+                .build();
+        return builder;
+    }
+
     /**
      * Tìm kiếm id của một sản phẩm có trong danh sách
      */
