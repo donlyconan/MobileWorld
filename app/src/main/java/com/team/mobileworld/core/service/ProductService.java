@@ -11,19 +11,20 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
-public interface LoadProductService {
+public interface ProductService {
 	
-	public static final String URL_HOME_PAGE = "api/catalog/home/";
+	public static final String URL_CATALOG_HOME = "api/catalog/home/";
 	
-	public static final String URL_SMARTPHONE_PAGE = "api/catalog/mobile/";
+	public static final String URL_CATALOG_MOBILE = "api/catalog/mobile/";
 	
-	public static final String URL_LAPTOP_PAGE = "api/catalog/laptop/";
+	public static final String URL_CATALOG_LAPTOP = "api/catalog/laptop/";
 
 	public static final String URL_LOAD_PAGE = "api/catalog/{page}";
 
 	public static final String URL_OPEN_LOAD = "api/catalog/query?";
 
 	/**
+	 * @GET, @POST, @DELETE, @PATCH, @PUT
 	 * @Body - Gửi các đối tượng Java dưới dạng thân yêu cầu.
 	 * @Url - sử dụng URL động.
 	 * 
@@ -41,21 +42,21 @@ public interface LoadProductService {
 	 *offset = hs * sosp
 	 *Limit
 	 * */
-	@GET(URL_HOME_PAGE)
+	@GET(URL_CATALOG_HOME)
 	Call<List<CatalogItem>> loadHomePage();
 
 	/**
 	 *  Lấy dữ liệu thông tin sản phầm cho trang View Smartphone
 	 * @return
 	 */
-	@GET(URL_SMARTPHONE_PAGE)
-	Call<List<CatalogItem>> loadSmartphonePage();
+	@GET(URL_CATALOG_MOBILE)
+	Call<List<CatalogItem>> loadMobilePage();
 
 	/**
 	 *  Lấy dữ liệu thông tin sản phầm cho trang View Laptop
 	 * @return
 	 */
-	@GET(URL_LAPTOP_PAGE)
+	@GET(URL_CATALOG_LAPTOP)
 	Call<CatalogItem> loadLaptopPage();
 
 
@@ -68,7 +69,7 @@ public interface LoadProductService {
 	 * @return
 	 */
 	@GET(URL_LOAD_PAGE)
-	Call<List<CatalogItem>>  openLoadDataOnPage(@Path("page") String page);
+	Call<List<CatalogItem>> loadPageFromServer(@Path("page") String page);
 
 	/**
 	 *  Tải thêm sản phẩm khi được yêu cầu
@@ -81,7 +82,7 @@ public interface LoadProductService {
 	 * @return
 	 */
 	@GET(URL_OPEN_LOAD)
-	Call<List<Product>> openLoadDataOnList(@QueryMap Map<String, String> params);
+	Call<List<Product>> extendsDataOnView(@QueryMap Map<String, String> params);
 
 
 }

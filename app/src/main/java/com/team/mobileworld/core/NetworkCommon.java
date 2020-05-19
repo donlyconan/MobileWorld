@@ -9,8 +9,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkCommon {
-    public static final int READ_TIME_OUT = 8000;
-    public static final int WRITE_TIME_OUT = 8000;
+    public static final int READ_TIME_OUT = 10000;
+    public static final int WRITE_TIME_OUT = 10000;
     public static final int CONNECT_TIME_OUT = 7000;
 
     //URL co ban

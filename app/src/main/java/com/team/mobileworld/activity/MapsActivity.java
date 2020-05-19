@@ -289,6 +289,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         googlemap = googleMap;
         showCurrentLocation();
+        googleMap.setMyLocationEnabled(true);
 
         if (Intent.CATEGORY_OPENABLE == getIntent().getAction()) {
             double lat = getIntent().getExtras().getFloat("lat");

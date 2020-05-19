@@ -12,12 +12,13 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
 
-public class Place {
+public class Place implements Serializable {
 	@SerializedName("place_id")
 	private String id;
 	@SerializedName("description")
@@ -35,7 +36,6 @@ public class Place {
 		this.description = description;
 		this.types = types;
 	}
-
 
 	@RequiresApi(api = Build.VERSION_CODES.N)
 	public static List<Place> getListPlace(ResponseBody response) throws JsonSyntaxException, IOException{

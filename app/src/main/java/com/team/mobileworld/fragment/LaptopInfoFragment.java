@@ -13,11 +13,11 @@ import androidx.fragment.app.Fragment;
 import com.team.mobileworld.R;
 import com.team.mobileworld.core.object.LaptopInfo;
 
-public class InfoLaptopFragment extends Fragment {
+public class LaptopInfoFragment extends Fragment {
 
     private LaptopInfo info;
 
-    public InfoLaptopFragment(LaptopInfo info) {
+    public LaptopInfoFragment(LaptopInfo info) {
         this.info = info;
     }
 

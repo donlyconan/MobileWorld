@@ -3,7 +3,6 @@ package com.team.mobileworld.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.team.mobileworld.R;
 import com.team.mobileworld.activity.MainActivity;
-import com.team.mobileworld.activity.ProductDetail;
+import com.team.mobileworld.activity.ProductDetailActivity;
 import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.object.Product;
 import com.team.mobileworld.core.task.OnItemClickListener;
@@ -61,10 +60,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemHold
 
         //Chay activity thong tin chi tiet san pham
         holder.view.setOnClickListener(e->{
-            Intent intent = new Intent(activity, ProductDetail.class);
+            Intent intent = new Intent(activity, ProductDetailActivity.class);
             intent.setAction(MainActivity.MAIN_OPEN_ORDER);
-            intent.putExtra(ProductDetail.SAN_PHAM, product);
-            activity.startActivityForResult(intent, ProductDetail.REQUEST_SIZE_AMOUNT);
+            intent.putExtra(ProductDetailActivity.ITEM, product);
+            activity.startActivityForResult(intent, ProductDetailActivity.REQUEST_SIZE_AMOUNT);
         });
     }
 

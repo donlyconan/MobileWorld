@@ -41,7 +41,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class ResultSearchActivity extends AppCompatActivity implements OnItemClickListener {
+public class SearchActivity extends AppCompatActivity implements OnItemClickListener {
 
     SearchView searchView;
     ImageButton btnback, btnfilter;

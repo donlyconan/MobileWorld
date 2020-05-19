@@ -3,8 +3,6 @@ package com.team.mobileworld.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -42,7 +40,7 @@ public class FeedbackActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
 
         inpemailto.setText(EMAIL);
-        inpform.setText(MainActivity.getUser().getEmail());
+        inpform.setText(MainActivity.getCurrentUser().getEmail());
         setSupportActionBar(toolbar);
 
         toolbar.setNavigationOnClickListener(e->finish());
@@ -69,7 +67,7 @@ public class FeedbackActivity extends AppCompatActivity {
                 if(ratingBar.getRating() > 0.0f && inpcontent.getText().toString().length() > 0) {
                     String myemail = inpform.getText().toString();
                     String emailrp = inpemailto.getText().toString();
-                    String title = String.format("Phải hồi từ người dùng %s.", MainActivity.getUser().getFullname());
+                    String title = String.format("Phải hồi từ người dùng %s.", MainActivity.getCurrentUser().getFullname());
                     String content = inpcontent.getText().toString();
                     DecimalFormat decimal = new DecimalFormat("#,##");
                     content = String.format("-Xếp hạng trải nghiệm: %s Sao\n-%s",decimal.format(ratingBar.getRating()), content);

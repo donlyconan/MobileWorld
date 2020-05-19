@@ -20,7 +20,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +32,6 @@ import com.team.mobileworld.core.handle.Validate;
 import com.team.mobileworld.core.object.Order;
 import com.team.mobileworld.core.object.User;
 import com.team.mobileworld.core.service.BasketService;
-import com.team.mobileworld.core.service.BillService;
 import com.team.mobileworld.core.task.Worker;
 
 import java.io.IOException;
@@ -52,7 +50,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.team.mobileworld.activity.MainActivity.RQ_OPEN_LOGIN;
-import static com.team.mobileworld.activity.MainActivity.getCart;
+import static com.team.mobileworld.activity.MainActivity.getBasket;
 
 public class OrderActivity extends AppCompatActivity {
     private static final int REQUEST_PERSON = 10;
@@ -61,10 +59,10 @@ public class OrderActivity extends AppCompatActivity {
 
     OrderApdater apdater;
     RecyclerView recycler;
-    List<Order> list;
+    List<Order> listProductOrder;
     TextView txtTStien, txtTSpham, txtTTien;
     EditText inpname, inpaddress;
-    Button btnDhang;
+    Button btnbuyproduct;
     ImageButton btnedit;
     Toolbar toolbar;
     List<Order> cart;
@@ -77,12 +75,13 @@ public class OrderActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_PERSON && resultCode == RESULT_OK) {
-            User user = MainActivity.getUser();
-            String line = String.format("%s | %s", get(user.getFullname()), get(user.getPnumber()));
+            User user = MainActivity.getCurrentUser();
+            String line = String.format("%s | %s", user.getFullname(), user.getPnumber());
             inpname.setText(line);
-            inpaddress.setText(get(user.getAddress()));
+            inpaddress.setText(user.getAddress());
         }
 
+        //cap nhat dia chi
         if (requestCode == REQUEST_ADDRESS && resultCode == RESULT_OK) {
             inpaddress.setText(MapsActivity.Address);
         }
@@ -100,16 +99,14 @@ public class OrderActivity extends AppCompatActivity {
         //Cai dat hien thi
         init();
 
-        btnDhang.setOnClickListener(e -> onActionOrder());
+        btnbuyproduct.setOnClickListener(e -> onActionOrder());
 
-        btnedit.setOnClickListener(e -> startPersonalInfo());
+        btnedit.setOnClickListener(e -> onActionOpenActivityPersonalInfo());
 
         //Xu ly su kien
         toolbar.setNavigationOnClickListener(e -> finish());
 
         imgaddress.setOnClickListener(e -> onActionOpenMap());
-
-
     }
 
     private void onActionOpenMap() {
@@ -117,7 +114,7 @@ public class OrderActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_ADDRESS);
     }
 
-    private void startPersonalInfo() {
+    private void onActionOpenActivityPersonalInfo() {
         Intent intent = new Intent(OrderActivity.this, PersonalInfoActivity.class);
         intent.setAction(Intent.ACTION_EDIT);
         startActivityForResult(intent, REQUEST_PERSON);
@@ -125,33 +122,46 @@ public class OrderActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onActionOrder() {
-        User user = MainActivity.getUser();
+        User user = MainActivity.getCurrentUser();
         String fullname = inpname.getText().toString();
         String address = inpaddress.getText().toString();
 
-//        Kiem tra so dien thoai nguoi nhan
-        if (user.isLogin() && user.hasPhoneNumber() && user.hasAddress()) {
+        /**
+         * Kiem tra thong nguoi dat hang
+         * -So dien thoai phai hop le
+         * -Dia chi phai cu the
+         * -Nguoi dat hang phai co tai khoan va co ma xac thucs
+         */
+        if (checkInfoAuthentication()) {
             BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
 
             dialog.show();
-            final List<Integer> idorders = list.stream().map(Order::getId).collect(Collectors.toList());
+            //tao danh sach san pham can dat
+            final List<Integer> idorders = listProductOrder.stream().map(Order::getId).collect(Collectors.toList());
 
             /**
              * Tao thong bao day cho ung dung
              */
             Intent intent = new Intent(this, BillActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0, intent, 0);
             final Notification noti = Handler.createNotificationChannel(this,pendingIntent
             , "Đặt hàng thành công!", "Bạn đã một đơn hàng, lúc "
                             + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()) +
-                            "hãy vào đơn mua để theo cập nhật thông tin sản phẩm sớm nhất.");
+                            " hãy vào đơn mua để theo cập nhật thông tin sản phẩm sớm nhất.")
+                    .setContentIntent(pendingIntent)
+                    .build();
+            noti.flags |= Notification.FLAG_AUTO_CANCEL;
             final NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
+            //Tao 1 cong viec dat san pham
             Worker worker = () -> {
                 Map<String, Object> map = new HashMap<>();
                 map.put("shiptoaddress", inpaddress.getText().toString());
                 map.put("idorders", idorders);
-                callorder = service.orderedList(user.getId(), map);
+
+                callorder = service.orderedList(user.getAccesstoken(), map);
 
                 callorder.enqueue(new Callback<ResponseBody>() {
                     @Override
@@ -159,12 +169,15 @@ public class OrderActivity extends AppCompatActivity {
                         if (response.isSuccessful()) {
                             try {
                                 JsonObject json = Handler.convertToJSon(response.body().string());
+
                                 if (json.has(MainActivity.MESSAGE)) {
-                                    MainActivity.getCart().removeIf(Order::isSelect);
+                                    MainActivity.getBasket().removeIf(Order::isSelect);
                                     Toast.makeText(OrderActivity.this, json.get(MainActivity.MESSAGE).getAsString(), Toast.LENGTH_SHORT).show();
+
                                     //Tra ve ok neu dat hang thanh cong
                                     manager.notify(0, noti);
                                     setResult(RESULT_OK);
+                                    dialog.dismiss();
                                     finish();
                                 } else {
                                     LoginActivity.showToast(getBaseContext(), json.get(MainActivity.ERROR).getAsString());
@@ -187,8 +200,8 @@ public class OrderActivity extends AppCompatActivity {
                 });
             };
 
-            if (ProductDetail.BUY_GOODS_NOW == getIntent().getAction()) {
-                Order item = list.get(0);
+            if (ProductDetailActivity.BUY_GOODS_NOW == getIntent().getAction()) {
+                Order item = listProductOrder.get(0);
                 idorders.clear();
                 idorders.add(item.getId());
                 addProductOnCart(item.getId(), item.getAmount(), worker);
@@ -203,9 +216,11 @@ public class OrderActivity extends AppCompatActivity {
 
     @MainThread
     public void addProductOnCart(int catalogid, int amount, Worker worker) {
+        //Thiet lap dich vu dat don hnag
         Call<ResponseBody> call = NetworkCommon.getRetrofit()
                 .create(BasketService.class)
-                .addOrder(MainActivity.getUser().getId(), catalogid, amount);
+                .addOrder(MainActivity.getCurrentUser().getAccesstoken(), catalogid, amount);
+
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -226,13 +241,15 @@ public class OrderActivity extends AppCompatActivity {
     }
 
 
-    private boolean validate(String fullname, String address, String sdt) {
+    private boolean checkInfoAuthentication() {
         boolean valid = true;
-        if (!Validate.valid(fullname, Validate.REGEX_NAME)) {
-            inpname.setError("Tên không hợp lệ");
+        User user = MainActivity.getCurrentUser();
+
+        if (!user.hasPhoneNumber() || user.getFullname().length() < 3) {
+            inpname.setError("Tên hoặc số điện thoại không hợp lệ");
             valid = false;
         }
-        if (!Validate.valid(address, Validate.REGEX_ADDRESS)) {
+        if (!user.hasAddress()) {
             inpaddress.setError("Địa chỉ không hợp lệ");
             valid = false;
         }
@@ -246,10 +263,10 @@ public class OrderActivity extends AppCompatActivity {
         recycler.setLayoutManager(new GridLayoutManager(this, 1));
         getDataFromIntent();
 
-        final User user = MainActivity.getUser();
-        cart = getCart();
+        final User user = MainActivity.getCurrentUser();
+        cart = getBasket();
 
-        if (MainActivity.getUser() != null) {
+        if (MainActivity.getCurrentUser() != null) {
             String line = String.format("%s | %s", user.getFullname(), user.getPnumber());
             inpname.setText(line);
             inpaddress.setText(user.getAddress());
@@ -262,8 +279,8 @@ public class OrderActivity extends AppCompatActivity {
         dialog.setIndeterminate(true);
 
         //cai dat thuoc tinh
-        txtTSpham.setText("Tổng số (" + Handler.getTotalAmount(list) + " sản phầm):");
-        String ThanhTien = Handler.formatMoney(Handler.getTotalMoney(list));
+        txtTSpham.setText("Tổng số (" + Handler.getTotalAmount(listProductOrder) + " sản phầm):");
+        String ThanhTien = Handler.formatMoney(Handler.getTotalMoney(listProductOrder));
         txtTStien.setText(ThanhTien);
         txtTTien.setText(ThanhTien);
     }
@@ -276,7 +293,7 @@ public class OrderActivity extends AppCompatActivity {
         txtTTien = findViewById(R.id.txtTTien);
         toolbar = findViewById(R.id.toolbar);
         recycler = findViewById(R.id.recycle_view);
-        btnDhang = findViewById(R.id.btnbuy);
+        btnbuyproduct = findViewById(R.id.btnbuy);
         btnedit = findViewById(R.id.btnedit);
         imgaddress = findViewById(R.id.imgaddress);
     }
@@ -287,14 +304,14 @@ public class OrderActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getDataFromIntent() {
-        if (getIntent().getAction() == ProductDetail.BUY_GOODS_NOW) {
+        if (getIntent().getAction() == ProductDetailActivity.BUY_GOODS_NOW) {
             Order item = (Order) getIntent().getExtras().get("item");
-            list = Arrays.asList(item);
+            listProductOrder = Arrays.asList(item);
         } else {
-            list = Handler.getProductSeleted(getCart());
+            listProductOrder = Handler.getProductSeleted(getBasket());
         }
-        apdater = new OrderApdater(this, list);
-        Log.d("SIZE", list.size() + "");
+        apdater = new OrderApdater(this, listProductOrder);
+        Log.d("SIZE", listProductOrder.size() + "");
         recycler.setAdapter(apdater);
     }
 

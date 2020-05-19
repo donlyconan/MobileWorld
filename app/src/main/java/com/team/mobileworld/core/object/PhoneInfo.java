@@ -3,7 +3,7 @@ package com.team.mobileworld.core.object;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
-public class SmartphoneInfo extends ProductInfo {
+public class PhoneInfo extends ProductInfo {
 	
 //	@SerializedName("cpu")
 //	private String cpu;
@@ -37,8 +37,8 @@ public class SmartphoneInfo extends ProductInfo {
 	
 	
 
-	public SmartphoneInfo(String cpu, String ram, String screen, String os, String backcamera, String frontcamera,
-			String internalmemmory, String memorystick, String sim, String batery) {
+	public PhoneInfo(String cpu, String ram, String screen, String os, String backcamera, String frontcamera,
+					 String internalmemmory, String memorystick, String sim, String batery) {
 //		this.cpu = cpu;
 //		this.ram = ram;
 //		this.screen = screen;
@@ -55,7 +55,7 @@ public class SmartphoneInfo extends ProductInfo {
 
 	@Override
 	public String toString() {
-		return "SmartphoneInfo [backcamera=" + backcamera + ", frontcamera=" + frontcamera + ", internalmemmory="
+		return "PhoneInfo [backcamera=" + backcamera + ", frontcamera=" + frontcamera + ", internalmemmory="
 				+ internalmemmory + ", memorystick=" + memorystick + ", sim=" + sim + ", batery=" + batery + "]";
 	}
 

@@ -22,35 +22,27 @@ public class Order implements Serializable {
     public static final int STATUS_RECEIVE = 2;
 
     @SerializedName("id")
-    @Expose
     private int id;
 
     @SerializedName("name")
-    @Expose
     private String name;
 
     @SerializedName("price")
-    @Expose
     private int price;
 
     @SerializedName("pictureuri")
-    @Expose
     private String image;
 
     @SerializedName("unit")
-    @Expose
     private int amount; // so luong
 
     @SerializedName("quantity")
-    @Expose
     private int slmax = 0;  // so luong
 
     @SerializedName("status")
-    @Expose
     private int status = 0;
 
     @SerializedName("catalogid")
-    @Expose
     private int catalogid;
 
     @SerializedName("updatedAt")

@@ -57,7 +57,7 @@ public class LoginMobileWorld {
 
         user = call.execute().body();
 
-        user = getInfoUser(user.getId());
+        user = getInfoUser(user.getAccesstoken());
 
         if (user == null)
             throw new IOException("Đăng nhập thất bại");
@@ -103,7 +103,7 @@ public class LoginMobileWorld {
     }
 
 
-    public static User getInfoUser(long id) throws IOException {
+    public static User getInfoUser(String token) throws IOException {
         /**
          * Goi den IP UserService de lay tat ca thong tin ve user
          * tham so truyen vao la id user
@@ -111,7 +111,7 @@ public class LoginMobileWorld {
          */
         UserService getuser = NetworkCommon.getRetrofit().create(UserService.class);
         //thuc hien goi lai
-        Call<User> userCall = getuser.getPersonalInfo(id);
+        Call<User> userCall = getuser.getPersonalInfo(token);
         //lay thong tin user
         User user = userCall.execute().body();
 

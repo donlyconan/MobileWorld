@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.JsonObject;
 import com.team.mobileworld.R;
 import com.team.mobileworld.activity.LoginActivity;
+import com.team.mobileworld.activity.MainActivity;
 import com.team.mobileworld.core.NetworkCommon;
 import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.object.Order;
@@ -113,7 +114,8 @@ public class OrderApdater extends RecyclerView.Adapter<OrderApdater.ItemHolder> 
         if (status == Order.STATUS_CONFIRM || status == Order.STATUS_DELIVRY) {
             statusChange = (status == Order.STATUS_CONFIRM ? Order.STATUS_CANCLE : Order.STATUS_RECEIVE);
             call = NetworkCommon.getRetrofit().create(BillService.class)
-                    .updateStatusOrder(idbill, statusChange);
+                    .updateStatusOrder(MainActivity.getCurrentUser().getAccesstoken()
+                            ,idbill, statusChange);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

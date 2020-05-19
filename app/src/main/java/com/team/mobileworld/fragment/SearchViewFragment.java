@@ -18,11 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.team.mobileworld.R;
-import com.team.mobileworld.activity.ResultSearchActivity;
+import com.team.mobileworld.activity.SearchActivity;
 import com.team.mobileworld.adapter.ProductAdapter;
 import com.team.mobileworld.adapter.SuggestAdapter;
 import com.team.mobileworld.core.object.Product;
-import com.team.mobileworld.core.task.OnItemClickListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.List;
 public class SearchViewFragment extends Fragment{
 
     LoadFragement fragload;
-    ResultSearchActivity activity;
+    SearchActivity activity;
     ProductAdapter adapter;
     SuggestAdapter suggestAdapter;
     RecyclerView recycler;
@@ -46,7 +45,7 @@ public class SearchViewFragment extends Fragment{
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onAttach(@NonNull Activity activity) {
-        this.activity = (ResultSearchActivity) activity;
+        this.activity = (SearchActivity) activity;
         super.onAttach(activity);
     }
 

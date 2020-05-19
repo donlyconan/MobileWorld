@@ -6,17 +6,16 @@
     android:layout_height="wrap_content"
     android:background="@color/colorToolbar"
     android:orientation="vertical"
+    android:paddingLeft="10dp"
     android:paddingTop="20dp"
-    android:paddingBottom="20dp"
-    android:paddingLeft="15dp"
     android:paddingRight="5dp"
-    >
+    android:paddingBottom="20dp">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_profit"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
         android:src="@drawable/ic_profit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,8 +29,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="5dp"
         android:hint="Email"
-        android:textColorHint="#EBEBEB"
         android:textColor="#FFFFFF"
+        android:textColorHint="#EBEBEB"
         android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

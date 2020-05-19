@@ -30,13 +30,6 @@ public class Weather {
         this.temp_max = temp_max;
     }
 
-    public static interface WeatherService {
-        public static final String BASE_URL = "http://api.openweathermap.org/";
-
-        @GET("data/2.5/weather?appid=20653c9dc554e39770224aa6a8891cb7&lang=vi")
-        public Call<ResponseBody> weartherPlace(@Query("lat") double lat, @Query("lon") double lon);
-    }
-
     public static Weather jsonConvertPlace(JsonObject json) {
         String city = json.get("name").getAsString();
         String decrip = json.getAsJsonArray("weather").get(0)

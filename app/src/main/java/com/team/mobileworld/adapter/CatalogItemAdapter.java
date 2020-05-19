@@ -1,7 +1,6 @@
 package com.team.mobileworld.adapter;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.team.mobileworld.R;
-import com.team.mobileworld.activity.MainActivity;
-import com.team.mobileworld.activity.ProductDetail;
 import com.team.mobileworld.core.object.CatalogItem;
-import com.team.mobileworld.core.object.Product;
 import com.team.mobileworld.core.task.OnItemClickListener;
-import com.team.mobileworld.core.task.ViewHolder;
 import com.team.mobileworld.fragment.CustomViewFragement;
 
 import java.util.List;

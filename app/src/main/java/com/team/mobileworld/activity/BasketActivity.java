@@ -5,8 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -22,7 +20,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.gson.JsonObject;
 import com.team.mobileworld.R;
-import com.team.mobileworld.adapter.CartAdapter;
+import com.team.mobileworld.adapter.BasketAdapter;
 import com.team.mobileworld.core.NetworkCommon;
 import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.object.Order;
@@ -39,14 +37,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CartActivity extends AppCompatActivity {
-    private static final int REQUEST_CHANGE_DATA = 0x0000c1;
-    private static final String ACTION_LOGIN = "Login For Buy";
-    private static final int REQUEST_LOGIN_ORDER = 0x0000c2;
+public class BasketActivity extends AppCompatActivity {
+    private static final int REQUEST_CHANGE_DATA = 0x001;
+    private static final int REQUEST_LOGIN_ORDER = 0x002;
+    private static final String ACTION_LOGIN = "open_acivity_login";
 
     private List<Order> cart;
-    private int amount = 0, index = -1;
-    CartAdapter adapter;
+    private int amount, index;
+    BasketAdapter adapter;
     private Order item;
 
     ListView listview;
@@ -68,8 +66,7 @@ public class CartActivity extends AppCompatActivity {
         }
 
         if (requestCode == REQUEST_LOGIN_ORDER) {
-            Database.print("REQUEST_LOGIN_ORDER");
-            cart = MainActivity.getCart();
+            cart = MainActivity.getBasket();
             adapter.setOrderList(cart);
             adapter.notifyDataSetChanged();
         }
@@ -79,10 +76,10 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
+        setContentView(R.layout.activity_basket);
 
         //Anh xa phan tu
-        elementMaping();
+        mapping();
 
         //Cai dat listview
         init();
@@ -94,12 +91,9 @@ public class CartActivity extends AppCompatActivity {
 
         btnthanhtoan.setOnClickListener(e -> onActionBuy());
 
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                txtthanhtien.setText(Handler.formatMoney(Handler.getTotalMoneySelected(cart)));
-            }
-        });
+        listview.setOnItemClickListener((parent, view, position, id) ->
+                txtthanhtien.setText(Handler.formatMoney(Handler.getTotalMoneySelected(cart)))
+        );
 
         txtthanhtien.setText(Handler.getFormatTotalMoneySelected(cart));
     }
@@ -112,33 +106,10 @@ public class CartActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void onActionBuy() {
-        /**
-         * Neu da dang nhap goi den vao activity mua hang
-         * Neu chua dangg nhap yeu cau dang nhap
-         */
-        if (!MainActivity.getUser().isLogin()) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivityForResult(intent, REQUEST_LOGIN_ORDER);
-        } else {
-            boolean canbuy = (MainActivity.getCart().stream().filter(Order::isSelect).count() != 0);
-
-            //Xem xét nếu có thể và không thể mua hàng
-            if (!canbuy) {
-                String text = cart.size() == 0 ? "Danh sách trống!" : "Bạn chưa chọn sản phầm nào!";
-                Toast.makeText(CartActivity.this.getBaseContext(), text, Toast.LENGTH_SHORT).show();
-            } else {
-                startActivityForResult(new Intent(CartActivity.this, OrderActivity.class)
-                        , REQUEST_CHANGE_DATA);
-            }
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
-        MainActivity.getCart().forEach(e -> e.setSelect(true));
-        cart = MainActivity.getCart();
-        adapter = new CartAdapter(CartActivity.this, cart);
+        MainActivity.getBasket().forEach(e -> e.setSelect(true));
+        cart = MainActivity.getBasket();
+        adapter = new BasketAdapter(BasketActivity.this, cart);
         listview.setAdapter(adapter);
         db = MainActivity.getDatabaseInstence();
         checkall = findViewById(R.id.ckSelAll);
@@ -146,8 +117,37 @@ public class CartActivity extends AppCompatActivity {
             checkall.setChecked(true);
 
     }
+    
+    
+    /**
+     * Xu ly su kien mua hang
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void onActionBuy() {
+        /**
+         * Neu da dang nhap goi den vao activity mua hang
+         * Neu chua dangg nhap yeu cau dang nhap
+         */
+        if (!MainActivity.getCurrentUser().isLogin()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, REQUEST_LOGIN_ORDER);
+        } else {
+            //tinh so san pham duoc chon
+            boolean canbuy = (MainActivity.getBasket().stream().filter(Order::isSelect).count() != 0);
 
-    private void elementMaping() {
+            //Xem xét nếu có thể và không thể mua hàng
+            if (!canbuy) {
+                String text = cart.size() == 0 ? "Danh sách trống!" : "Bạn chưa chọn sản phầm nào!";
+                Toast.makeText(BasketActivity.this.getBaseContext(), text, Toast.LENGTH_SHORT).show();
+            } else {
+                startActivityForResult(new Intent(BasketActivity.this, OrderActivity.class)
+                        , REQUEST_CHANGE_DATA);
+            }
+        }
+    }
+
+
+    private void mapping() {
         listview = findViewById(R.id.listvieworder);
         txtthanhtien = findViewById(R.id.txtThanhTien);
         btnthanhtoan = findViewById(R.id.btMuaHang);
@@ -170,12 +170,14 @@ public class CartActivity extends AppCompatActivity {
         switch (id) {
             case R.id.item_delete: {
                 //Tính tổng số lượng sản phẩm  được chọn có trong giỏ hàng
-                int count = cart.stream().filter(x->!x.isSelect())
+                int count = cart.stream().filter(x -> !x.isSelect())
                         .mapToInt(Order::getAmount).sum();
 
-                if (MainActivity.getUser().isLogin())
+                if (MainActivity.getCurrentUser().isLogin())
+                    //xoa san pham tren server
                     deleteOnServer(count);
                 else
+                    //xoa san pham tai local database
                     deleteOnLocalDatabase(count);
                 txtthanhtien.setText(Handler.getFormatTotalMoneySelected(cart));
                 return true;
@@ -203,13 +205,16 @@ public class CartActivity extends AppCompatActivity {
             String message = "Bạn có muốn xóa " + count + " sản phẩm ra khỏi giỏ hàng không?";
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this).
-                    setTitle("Xoá").setMessage(message)
+                    setTitle("Xoá sản phẩm").setMessage(message)
                     .setNegativeButton("Có", (e, mid) -> {
                         int index = 0;
-                        List<Order> arrList = cart.stream().filter(x->!x.isSelect()).collect(Collectors.toList());
+                        //Lay danh sach san pham can xoa
+                        List<Order> arrList = cart.stream().filter(x -> !x.isSelect()).collect(Collectors.toList());
 
+                        //Xoa san pham tai local
                         MainActivity.getDatabaseInstence()
                                 .deleteOrders(arrList);
+                        //xoa san pham trong gio hang
                         cart.removeAll(arrList);
                         adapter.notifyDataSetChanged();
                         Database.print("Delete count=" + index + "\t\t size=" + cart.size());
@@ -228,13 +233,15 @@ public class CartActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                     .setTitle("Xoá").setMessage(message)
                     .setNegativeButton("Có", (e, mid) -> {
-                        List<Integer> delids = cart.stream().filter(x->!x.isSelect())
+                        List<Integer> delids = cart.stream().filter(x -> !x.isSelect())
                                 .mapToInt(Order::getId)
                                 .boxed()
                                 .collect(Collectors.toList());
 
                         BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
-                        Call<ResponseBody> call = service.deleteOrder(MainActivity.getUser().getId(), delids);
+
+                        //Goi den api xoa san pham
+                        Call<ResponseBody> call = service.deleteOrder(MainActivity.getCurrentUser().getAccesstoken(), delids);
 
                         call.enqueue(new Callback<ResponseBody>() {
                             @Override
@@ -242,9 +249,9 @@ public class CartActivity extends AppCompatActivity {
                                 try {
                                     JsonObject json = Handler.convertToJSon(response.body().string());
                                     if (response.isSuccessful() && json.has(MainActivity.MESSAGE)) {
-                                        Toast.makeText(CartActivity.this,
+                                        Toast.makeText(BasketActivity.this,
                                                 "Đã xóa " + count + " sản phẩm", Toast.LENGTH_SHORT).show();
-                                        cart.removeIf(e->delids.contains(e.getId()));
+                                        cart.removeIf(e -> delids.contains(e.getId()));
                                         adapter.notifyDataSetChanged();
                                     } else
                                         LoginActivity.showToast(getBaseContext(), json.get(MainActivity.ERROR).getAsString());
@@ -255,7 +262,7 @@ public class CartActivity extends AppCompatActivity {
 
                             @Override
                             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                Toast.makeText(CartActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BasketActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }).setPositiveButton("Không", null);

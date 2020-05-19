@@ -1,4 +1,4 @@
-package com.team.mobileworld.fragment;
+package com.team.mobileworld.adapter;
 
 import android.os.Build;
 
@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.ListFragment;
 
 import com.team.mobileworld.core.object.Order;
+import com.team.mobileworld.fragment.BillFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;

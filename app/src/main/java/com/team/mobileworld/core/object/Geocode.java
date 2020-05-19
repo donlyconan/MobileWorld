@@ -39,7 +39,7 @@ public class Geocode {
 	public static List<Geocode> getListGeocode(ResponseBody response) throws JsonSyntaxException, IOException{
 		List<Geocode> geocodes = new ArrayList<Geocode>(20);
 		JsonObject json = (JsonObject) new JsonParser().parse(response.string());
-		JsonArray array = json.get("results").getAsJsonArray();
+		JsonArray array = json.getAsJsonArray("results");
 		json = array.get(0).getAsJsonObject();
 		array = json.get("locations").getAsJsonArray();
 		array.forEach(e->geocodes.add(geocodeFromJson(e.getAsJsonObject())));

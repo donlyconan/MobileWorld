@@ -27,7 +27,7 @@ public class Validate {
      * .{8,}  ít nhất 8 ký tự
      */
 
-    public static boolean valid(String input, String regex) {
+    public static boolean validate(String input, String regex) {
         if (input == null) return false;
         Pattern pattern = Pattern.compile(regex);
         return pattern.matcher(input).matches();

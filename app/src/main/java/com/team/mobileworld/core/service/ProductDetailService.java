@@ -9,6 +9,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface ProductDetailService {
+	
 	public static final String URL_PRODUCT_INFO = "api/catalog/{id}";
 	
 	public static final String URL_TECHNICAL_INFO = "api/catalog/detail/{id}";

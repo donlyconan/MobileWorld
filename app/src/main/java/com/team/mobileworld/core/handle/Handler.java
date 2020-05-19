@@ -48,20 +48,19 @@ public class Handler {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public static Notification createNotificationChannel(
+    public static Notification.Builder createNotificationChannel(
             Activity activity
             , PendingIntent intent
             , String title
             , String content) {
 
-        Notification builder = new Notification.Builder(activity)
+        Notification.Builder builder = new Notification.Builder(activity)
                 .setSmallIcon(R.drawable.logo)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setDefaults(Notification.DEFAULT_SOUND)
                 .setAutoCancel(true)
-                .addAction(R.drawable.ic_notifications, "Open", intent)
-                .build();
+                .addAction(R.drawable.ic_notifications, "Open", intent);
         return builder;
     }
 

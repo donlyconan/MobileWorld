@@ -6,19 +6,19 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.Header;
 
 public interface NotificationService {
 
-    public static final String URL_LOAD = "/api/bill/notify?";
+    public static final String API_BILL_NOTIFY = "/api/bill/notify";
 
-    public static final String URL_LOAD_UPDATE = "/api/bill/notify?";
+    public static final String URL_LOAD_UPDATE = "/api/bill/notify";
 
-    @GET(URL_LOAD)
-    Call<List<Message>> loadNotification(@Query("userid") long userid);
+    @GET(API_BILL_NOTIFY)
+    Call<List<Message>> loadNotification(@Header("x-access-token") String accesstoken);
 
 
     @GET(URL_LOAD_UPDATE)
-    Call<List<Message>> loadNotificationUpdate(@Query("userid") long userid);
+    Call<List<Message>> loadNotificationUpdate(@Header("x-access-token") String accesstoken);
 
 }

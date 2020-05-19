@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     public static final int REQUEST_SIGNUP = 200;
     public static final int ADD_INFO_USER = 201;
     public static final String ITEM_USER = "userinfo";
-    public static final String OPEN_LOAD_USERINFO = "load user info";
+    public static final String OPEN_LOAD_USERINFO = "load_user_info";
     private static final long DELAY_APP = 3000;
 
     private EditText inpemail;
@@ -88,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //Anh xa phan tu
-        elementMapping();
+        mapping();
 
         db = MainActivity.getDatabaseInstence();
 
@@ -123,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
         public void onSuccess(LoginResult loginResult) {
             dialog.show();
             Worker success = () -> {
-                if (MainActivity.getUser().isLogin()) {
+                if (MainActivity.getCurrentUser().isLogin()) {
                     onLoginSuccess();
                     setResult(RESULT_OK);
                 } else {
@@ -161,12 +161,12 @@ public class LoginActivity extends AppCompatActivity {
         btnok.setOnClickListener(e -> {
             String username = inpusername.getText().toString(), email = inpemail.getText().toString();
             boolean hoantat = true;
-            if (!Validate.valid(username, Validate.REGEX_USERNAME)) {
+            if (!Validate.validate(username, Validate.REGEX_USERNAME)) {
                 hoantat = false;
                 inpusername.setError("Tài khoản không hợp lệ!");
             }
 
-            if (!Validate.valid(email, Validate.REGEX_EMAIL)) {
+            if (!Validate.validate(email, Validate.REGEX_EMAIL)) {
                 hoantat = false;
                 inpemail.setError("Email không hợp lệ!");
             }
@@ -216,12 +216,13 @@ public class LoginActivity extends AppCompatActivity {
     //Lấy thông tin người kết nối FB
     public void loginWithFacebook(Worker action) {
 
-        //API hiển thị activity đăng nhập
+        //Su dung GraphReuest lay thong tin nguoi dang ky dich vu
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 try {
                     user = LoginMobileWorld.getInfoFromJsonFacebook(object);
+                    String myavatar = user.getAvatar();
                     Log.d(TAG, "response: " + response.toString());
 
                     //Dang nhap
@@ -232,13 +233,16 @@ public class LoginActivity extends AppCompatActivity {
                     call.enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(Call<User> call, Response<User> response) {
-                            String profit = user.getProfit();
                             user = response.body();
-                            Database.print(user + "");
+                            Database.print(user.toString());
+
                             if (response.isSuccessful() && user != null) {
-                                user.setProfit(profit);
                                 user.setLink(User.LOGIN_FACEBOOK);
-                                MainActivity.setUser(user);
+
+                                if(user.getAvatar() == null)
+                                    user.setAvatar(myavatar);
+
+                                MainActivity.setCurrentUser(user);
                                 action.hanlde();
                             } else
                                 Toast.makeText(getBaseContext(), "Đăng nhập thất bại!", Toast.LENGTH_SHORT)
@@ -281,9 +285,9 @@ public class LoginActivity extends AppCompatActivity {
         dialog = new ProgressDialog(LoginActivity.this);
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
-        dialog.setMessage("Đang đăng nhập");
+        dialog.setMessage("Đang đăng nhập...");
 
-        user = MainActivity.getUser();
+        user = MainActivity.getCurrentUser();
 
         //Neu la hanh dong tu dong dang nap truyen tu ham main se thuc hien tu dong dang nhap
         if (MainActivity.ACTION_AUTO_LOGIN.equals(getIntent().getAction()) && account != null) {
@@ -300,7 +304,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void elementMapping() {
+    private void mapping() {
         inpemail = findViewById(R.id.inp_email);
         inppassword = findViewById(R.id.inp_password);
         btnlogin = findViewById(R.id.btn_login);
@@ -358,7 +362,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null && user.isLogin() && response.isSuccessful()) {
                     Database.print("id user=" + user);
                     user.setLink(User.LOGIN_ACCOUNT);
-                    MainActivity.setUser(user);
+                    MainActivity.setCurrentUser(user);
                     onLoginSuccess();
                     onActionChange(remember.isChecked());
                 } else {
@@ -395,18 +399,18 @@ public class LoginActivity extends AppCompatActivity {
             pushDataToServer();
         } catch (IOException e) {
         }
-        MainActivity.getCart().clear();
+        MainActivity.getBasket().clear();
 
         BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
 
-        Call<List<Order>> call = service.loadCart(MainActivity.getUser().getId());
+        Call<List<Order>> call = service.loadCart(MainActivity.getCurrentUser().getAccesstoken());
 
         call.enqueue(new Callback<List<Order>>() {
             @Override
             public void onResponse(Call<List<Order>> call, Response<List<Order>> response) {
                 db.print("Json get Cart:" + response.body());
                 if (response.isSuccessful()) {
-                    MainActivity.getCart().addAll(response.body());
+                    MainActivity.getBasket().addAll(response.body());
                     onStartMainActivity();
                 }
             }
@@ -425,13 +429,13 @@ public class LoginActivity extends AppCompatActivity {
     @MainThread
     public void pushDataToServer() throws IOException {
         Database db = MainActivity.getDatabaseInstence();
-        User user = MainActivity.getUser();
+        User user = MainActivity.getCurrentUser();
 
         List<Order> list = db.getAllCart();
         BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
 
         for (Order item : list) {
-            Call<ResponseBody> call = service.addOrder(user.getId(), item.getId(), item.getAmount());
+            Call<ResponseBody> call = service.addOrder(user.getAccesstoken(), item.getId(), item.getAmount());
             synchronized (call) {
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
@@ -459,11 +463,11 @@ public class LoginActivity extends AppCompatActivity {
         String username = inpemail.getText().toString();
         String password = inppassword.getText().toString();
 
-        if (!Validate.valid(username, Validate.REGEX_USERNAME)) {
+        if (!Validate.validate(username, Validate.REGEX_USERNAME)) {
             inpemail.setError("Tài khoản không hợp lệ.");
             valid = false;
         }
-        if (!Validate.valid(password, Validate.REGEX_PASSWORD)) {
+        if (!Validate.validate(password, Validate.REGEX_PASSWORD)) {
             inppassword.setError("Mật khẩu không hợp lệ");
             valid = false;
         }

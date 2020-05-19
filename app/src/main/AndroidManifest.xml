@@ -14,12 +14,12 @@
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality.
     -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
 
     <application
@@ -45,7 +45,7 @@
 
 
         <activity android:name=".activity.FeedbackActivity" />
-        <activity android:name=".activity.ActivityNotification" />
+        <activity android:name=".activity.NotificationActivity" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -68,11 +68,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.BillActivity" />
-        <activity android:name=".activity.ResultSearchActivity" />
+        <activity android:name=".activity.SearchActivity" />
         <activity android:name=".activity.OrderActivity" />
         <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.CartActivity" />
-        <activity android:name=".activity.ProductDetail" />
+        <activity android:name=".activity.BasketActivity" />
+        <activity android:name=".activity.ProductDetailActivity" />
         <activity android:name=".activity.PersonalInfoActivity" />
         <activity android:name=".activity.SignupActivity" />
         <activity android:name=".activity.PhoneActivity" />
@@ -80,7 +80,6 @@
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

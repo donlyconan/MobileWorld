@@ -11,15 +11,12 @@ public class CatalogItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @SerializedName("title")
-    @Expose
     private String title;
 
     @SerializedName("product")
-    @Expose
     private List<Product> products;
 
     @SerializedName("mode")
-    @Expose
     private int mode;
 
     public CatalogItem(String title, List<Product> products, int mode) {

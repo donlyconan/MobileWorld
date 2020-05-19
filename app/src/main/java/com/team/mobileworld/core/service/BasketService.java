@@ -36,7 +36,7 @@ public interface BasketService {
      * @return
      */
     @GET(URL_GET_CART)
-    Call<List<Order>> loadCart(@Query("userid") long id);
+    Call<List<Order>> loadCart(@Header("x-access-token") String token);
 
     /**
      * Giu thong tin du lieu san pham ma khach hang da dat nen server
@@ -54,7 +54,7 @@ public interface BasketService {
 
     @FormUrlEncoded
     @POST(URL_ADD_PRODUCT_ON_CART)
-    Call<ResponseBody> addOrder(@Header("id") long userid, @Field("catalogid") int catalogid, @Field("unit") int amount);
+    Call<ResponseBody> addOrder(@Header("x-access-token") String token, @Field("catalogid") int catalogid, @Field("unit") int amount);
 
 
 
@@ -70,7 +70,7 @@ public interface BasketService {
      */
     @FormUrlEncoded
     @PUT(URL_UPDATE_CART)
-    Call<ResponseBody> updateCart(@Header("id") long userid, @Field("catalogid") int catalogids, @Field("unit") int amount);
+    Call<ResponseBody> updateCart(@Header("x-access-token") String token, @Field("catalogid") int catalogids, @Field("unit") int amount);
 
 
     /**
@@ -81,7 +81,7 @@ public interface BasketService {
      * @return
      */
     @POST(URL_POST_CART)
-    Call<ResponseBody> orderedList(@Header("id") long userid, @Body Map<String, Object> mapBody);
+    Call<ResponseBody> orderedList(@Header("x-access-token") String token, @Body Map<String, Object> mapBody);
 
 
     /**
@@ -95,18 +95,5 @@ public interface BasketService {
      * @return
      */
     @POST(URL_DEL_PRODUCT_ON_CART)
-    Call<ResponseBody> deleteOrder(@Header("id") long userid, @Body List<Integer> idorders);
-
-    /**
-     * Giử 1 danh sách các mặt hàng lên Server
-     * trả về:
-     * message: nếu thêm thành công
-     * error: nếu xảy ra lỗi
-     *
-     * @param id
-     * @param catalog
-     * @return
-     */
-    @POST(URL_ADD_PRODUCT_ON_CART)
-    Call<ResponseBody> addOrders(@Header("id") long userid, @Body List<Integer> catalogids, @Body List<Integer> units);
+    Call<ResponseBody> deleteOrder(@Header("x-access-token") String token, @Body List<Integer> idorders);
 }

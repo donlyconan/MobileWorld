@@ -5,15 +5,15 @@
 
     <group android:checkableBehavior="all">
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/item_home"
             android:icon="@drawable/img_home"
             android:title="Trang chủ" />
         <item
-            android:id="@+id/nav_phone"
+            android:id="@+id/item_phone"
             android:icon="@drawable/img_smartphone"
             android:title="Điện thoại" />
         <item
-            android:id="@+id/nav_laptop"
+            android:id="@+id/item_laptop"
             android:icon="@drawable/img_laptop"
             android:title="Laptop" />
     </group>
@@ -21,7 +21,7 @@
     <item android:title="Thông báo">
         <menu>
             <item
-                android:id="@+id/nav_noti"
+                android:id="@+id/item_notification"
                 android:icon="@drawable/ic_notifications"
                 android:title="Thông báo" />
         </menu>
@@ -34,11 +34,11 @@
                 android:icon="@drawable/ic_bill"
                 android:title="Đặt mua" />
             <item
-                android:id="@+id/nav_user"
+                android:id="@+id/item_user"
                 android:icon="@drawable/img_user"
                 android:title="Thông tin tài khoản" />
             <item
-                android:id="@+id/nav_logut"
+                android:id="@+id/item_logut"
                 android:icon="@drawable/img_logout"
                 android:title="Đăng xuất" />
         </menu>
@@ -47,7 +47,7 @@
     <item android:title="Ứng dụng">
         <menu>
             <item
-                android:id="@+id/nav_feedback"
+                android:id="@+id/item_feedback"
                 android:icon="@drawable/ic_feedback"
                 android:title="Phản hồi" />
         </menu>

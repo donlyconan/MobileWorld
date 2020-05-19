@@ -47,6 +47,7 @@ public class Database extends SQLiteOpenHelper {
         order.put("name", "nvarchar(100)");
         order.put("image", "text");
         order.put("amount", "int");
+        order.put("slmax", "int");
         order.put("price", "int");
 
         String tablecart = makeTable(TABLE_CART, order);
@@ -169,7 +170,7 @@ public class Database extends SQLiteOpenHelper {
     //Lay tat ca danh ba co trong db
     public List<Order> getAllCart() {
         //Truy van sql
-        String sql = "select id,name,price,image,amount from " + TABLE_CART;
+        String sql = "select id,name,price,image,amount, slmax from " + TABLE_CART;
         //Lay doi tuong db sqlite
         SQLiteDatabase db = this.getReadableDatabase();
         //Chay cau truy van tra ve dang cursor
@@ -186,8 +187,10 @@ public class Database extends SQLiteOpenHelper {
                 int price = cur.getInt(2);
                 String urlimage = cur.getString(3);
                 int amount = cur.getInt(4);
+                int slmax = cur.getInt(5);
 
                 Order order = new Order(id, name, price, urlimage, amount);
+                order.setSlmax(slmax);
                 list.add(order);
             }
 
@@ -213,6 +216,7 @@ public class Database extends SQLiteOpenHelper {
         cv.put("price", order.getPrice());
         cv.put("amount", order.getAmount());
         cv.put("image", order.getImage());
+        cv.put("slmax", order.getSlmax());
 
 
         long insert = db.insert(TABLE_CART, null, cv);
@@ -230,6 +234,7 @@ public class Database extends SQLiteOpenHelper {
         cv.put("price", order.getPrice());
         cv.put("amount", order.getAmount());
         cv.put("image", order.getImage());
+        cv.put("slmax", order.getSlmax());
 
 
         long update = db.update(TABLE_CART, cv, "id=" + id, null);
@@ -243,6 +248,7 @@ public class Database extends SQLiteOpenHelper {
                 soluong, id);
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL(sql);
+        print(String.format("Update don hang %s: %s", id, soluong));
         db.close();
     }
 

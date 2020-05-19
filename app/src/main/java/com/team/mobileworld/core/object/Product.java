@@ -20,26 +20,20 @@ public class Product implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @SerializedName("id")
-    @Expose
     private int id;
     @SerializedName("name")
-    @Expose
     private String name;
     @SerializedName("price")
-    @Expose
     private Integer price;
     @SerializedName("pictureuri")
-    @Expose
     private String image;
     @SerializedName("description")
-    @Expose
     private String description;
     @SerializedName("catalogtypeid")
-    @Expose
     private int categoryid;
     @SerializedName("quantity")
-    @Expose
     private int slmax;
+
 
     public Product(int id, String name, Integer price, String image, String description, int categoryid) {
         this.id = id;
@@ -132,6 +126,5 @@ public class Product implements Serializable {
     public void setSlmax(int slmax) {
         this.slmax = slmax;
     }
-
 
 }

@@ -32,14 +32,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CartAdapter extends BaseAdapter {
+public class BasketAdapter extends BaseAdapter {
     Activity activity;
     List<Order> orderList;
     private int size = 0;
     private Long sum = 0l;
     private Call<ResponseBody> call;
 
-    public CartAdapter(Activity activity, List<Order> orderList) {
+    public BasketAdapter(Activity activity, List<Order> orderList) {
         this.activity = activity;
         this.orderList = orderList;
 
@@ -122,8 +122,9 @@ public class CartAdapter extends BaseAdapter {
 
         holder.btnPlus.setOnClickListener(e -> {
             holder.btnMinus.setEnabled(true);
+
             order.setAmount(order.getAmount() + 1);
-            update((int) MainActivity.getUser().getId(), order.getId(), +1);
+            update(MainActivity.getCurrentUser().getAccesstoken(), order.getId(), +1);
             holder.txtValue.setText(order.getAmount() + "");
             holder.txtPriceOrder.setText(formatMoney(order.getTotalMoney()));
 
@@ -139,7 +140,7 @@ public class CartAdapter extends BaseAdapter {
             holder.btnPlus.setEnabled(true);
             order.setAmount(order.getAmount() - 1);
             holder.txtValue.setText(order.getAmount() + "");
-            update((int) MainActivity.getUser().getId(), order.getId(), -1);
+            update(MainActivity.getCurrentUser().getAccesstoken(), order.getId(), -1);
             holder.txtPriceOrder.setText(formatMoney(order.getTotalMoney()));
             txtMoney.setText(Handler.getFormatTotalMoneySelected(orderList));
 
@@ -149,10 +150,10 @@ public class CartAdapter extends BaseAdapter {
         return view;
     }
 
-    public void update(int userid, int catalogid, final int amount) {
-        if (MainActivity.getUser().isLogin()) {
+    public void update(String token, int catalogid, final int amount) {
+        if (MainActivity.getCurrentUser().isLogin()) {
             call = NetworkCommon.getRetrofit().create(BasketService.class)
-                    .addOrder(userid, catalogid, amount);
+                    .addOrder(token, catalogid, amount);
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

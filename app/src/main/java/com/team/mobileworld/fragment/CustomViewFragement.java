@@ -2,7 +2,6 @@ package com.team.mobileworld.fragment;
 
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,13 +24,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.team.mobileworld.R;
 import com.team.mobileworld.activity.MainActivity;
-import com.team.mobileworld.activity.ProductDetail;
 import com.team.mobileworld.adapter.CatalogItemAdapter;
 import com.team.mobileworld.core.NetworkCommon;
 import com.team.mobileworld.core.database.Database;
 import com.team.mobileworld.core.object.CatalogItem;
-import com.team.mobileworld.core.object.Product;
-import com.team.mobileworld.core.service.LoadProductService;
+import com.team.mobileworld.core.service.ProductService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,10 +84,10 @@ public class CustomViewFragement extends Fragment {
                 .beginTransaction()
                 .replace(R.id.frag_main, fragload).commit();
 
-        LoadProductService service = NetworkCommon.getRetrofit().create(LoadProductService.class);
+        ProductService service = NetworkCommon.getRetrofit().create(ProductService.class);
 
         //Goi lai service lay du lieu
-        call = service.openLoadDataOnPage(page);
+        call = service.loadPageFromServer(page);
         Database.print(call.request().toString());
 
         call.enqueue(new Callback<List<CatalogItem>>() {

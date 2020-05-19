@@ -62,7 +62,7 @@ public class PhoneActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menucartorder:
-                Intent intent = new Intent(getApplicationContext(), CartActivity.class);
+                Intent intent = new Intent(getApplicationContext(), BasketActivity.class);
                 startActivity(intent);
                 break;
         }
@@ -73,7 +73,7 @@ public class PhoneActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), ProductDetail.class);
+                Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
                 intent.putExtra("thongtin", phoneList.get(position));
                 startActivity(intent);
             }

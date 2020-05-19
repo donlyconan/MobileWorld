@@ -72,37 +72,6 @@ public class BillActivity extends AppCompatActivity {
         //Lay du lieu tren server
         getCurrentDatas();
 
-        //Thuc hien searh
-
-//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @RequiresApi(api = Build.VERSION_CODES.N)
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                List<Order> filList = null;
-//                switch (position) {
-//                    case 0:
-//                        filList = list.stream().filter(e -> e.getStatus() == Order.STATUS_DELIVRY).collect(Collectors.toList());
-//                        adapter.setList(filList);
-//                        break;
-//                    case 1:
-//                        filList = list.stream().filter(e -> e.getStatus() == Order.STATUS_RECEIVE).collect(Collectors.toList());
-//                        adapter.setList(filList);
-//                        break;
-//                    case 2:
-//                        adapter.setList(list);
-//                        break;
-//
-//                    default:
-//                        break;
-//                }
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
     }
 
     public void getCurrentDatas() {
@@ -150,11 +119,11 @@ public class BillActivity extends AppCompatActivity {
     }
 
     void loadDataFromServer(int status) {
-        User user = MainActivity.getUser();
+        User user = MainActivity.getCurrentUser();
         //Thiet lap service
         BillService service = NetworkCommon.getRetrofit().create(BillService.class);
 
-        Call<List<Order>> call = service.loadBill(user.getId(), status);
+        Call<List<Order>> call = service.loadBill(user.getAccesstoken(), status);
 
         call.enqueue(new Callback<List<Order>>() {
             @RequiresApi(api = Build.VERSION_CODES.N)

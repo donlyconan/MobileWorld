@@ -14,7 +14,7 @@ public interface LocationService {
 	
 	
 
-	//https://maps.googleapis.com/maps/api/place/autocomplete/json?input=199%20pope%20road,%20summerside&types=address&key=YOUKEYHERE
+	//https://maps.googleapis.com/maps/api/place/autocomplete/json?input=199%20pope%20road,%20summerside&types=address&key=...
 	@GET("api/place/autocomplete/json?radius="+VIETNAM+"&types=address&key=AIzaSyBN9m6S4grySLSwI1nsDeLomFyRHz0MZo8")
 	Call<ResponseBody> searchPlaceLocation(@Query("input") String address);
 	

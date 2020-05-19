@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonObject;
 import com.team.mobileworld.R;
 import com.team.mobileworld.adapter.NotifyAdapter;
@@ -24,6 +26,7 @@ import com.team.mobileworld.core.handle.LocationInfo;
 import com.team.mobileworld.core.object.Message;
 import com.team.mobileworld.core.object.Weather;
 import com.team.mobileworld.core.service.NotificationService;
+import com.team.mobileworld.core.service.WeatherService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ActivityNotification extends AppCompatActivity {
+public class NotificationActivity extends AppCompatActivity {
     private static final long WAIT_TIME = 5000;
     public static boolean runthread = true;
     Toolbar toolbar;
@@ -76,6 +79,7 @@ public class ActivityNotification extends AppCompatActivity {
             }, MainActivity.REQUEST_LOCATION);
         } else
             LocationInfo.getCurrentLocation();
+        Log.d("Current location", "" + LocationInfo.getLatLng().toString());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -97,7 +101,7 @@ public class ActivityNotification extends AppCompatActivity {
         list.clear();
         serviceload = NetworkCommon.getRetrofit()
                 .create(NotificationService.class)
-                .loadNotification(MainActivity.getUser().getId());
+                .loadNotification(MainActivity.getCurrentUser().getAccesstoken());
         serviceload.enqueue(new Callback<List<Message>>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -119,9 +123,11 @@ public class ActivityNotification extends AppCompatActivity {
     }
 
     public void loadInfoWeather() {
-        weatherService = NetworkCommon.buildURL(Weather.WeatherService.BASE_URL)
-                .create(Weather.WeatherService.class)
-                .weartherPlace(21.02, 105.84);
+        LatLng location = LocationInfo.getLatLng();
+
+        weatherService = NetworkCommon.buildURL(WeatherService.BASE_URL)
+                .create(WeatherService.class)
+                .weartherPlace(location.latitude, location.longitude);
         weatherService.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -141,10 +147,7 @@ public class ActivityNotification extends AppCompatActivity {
                                 , Calendar.getInstance().getTime()
                                 , 1
                         );
-                        if (list.isEmpty())
-                            list.add(message);
-                        else
-                            list.set(0, message);
+                        list.add(0, message);
                         adapter.notifyDataSetChanged();
                     } catch (IOException e) {
                         e.printStackTrace();

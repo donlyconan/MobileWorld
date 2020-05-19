@@ -30,14 +30,14 @@ import com.team.mobileworld.core.NetworkCommon;
 import com.team.mobileworld.core.handle.Handler;
 import com.team.mobileworld.core.object.LaptopInfo;
 import com.team.mobileworld.core.object.Order;
+import com.team.mobileworld.core.object.PhoneInfo;
 import com.team.mobileworld.core.object.Product;
-import com.team.mobileworld.core.object.SmartphoneInfo;
 import com.team.mobileworld.core.object.User;
 import com.team.mobileworld.core.service.BasketService;
 import com.team.mobileworld.core.service.ProductDetailService;
 import com.team.mobileworld.core.database.Database;
-import com.team.mobileworld.fragment.InfoLaptopFragment;
-import com.team.mobileworld.fragment.InfoSmarphoneFragement;
+import com.team.mobileworld.fragment.LaptopInfoFragment;
+import com.team.mobileworld.fragment.PhoneInfoFragement;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,14 +50,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductDetail extends AppCompatActivity {
-    public static final String PRODUCT_OPEN_ORDER = "PRODUCT_OPEN_ORDER";
-    public static final String BUY_GOODS_NOW = "Open buy Product";
-    public static final String SAN_PHAM = "Item";
-    private static final String ACTION_BUY_PRODUCT = "Buy product";
+public class ProductDetailActivity extends AppCompatActivity {
+    public static final String PRODUCT_OPEN_ORDER = "open_order";
+    public static final String BUY_GOODS_NOW = "open_activity_buy_product";
+    public static final String ITEM = "item_detail";
+    private static final String ACTION_BUY_PRODUCT = "action_buy_product";
 
-    public static final int REQUEST_SIZE_AMOUNT = 0xf001;
-    private static final int REQUEST_LOGIN_ORDER = 0xf002;
+    public static final int REQUEST_SIZE_AMOUNT = 0x001;
+    public static final int REQUEST_LOGIN_ORDER = 0x002;
 
     private Product item;
     private Database db;
@@ -71,8 +71,8 @@ public class ProductDetail extends AppCompatActivity {
     Button btnOrder, btnBuy;
     ImageButton btnshare;
     FragmentManager fmanager;
-    InfoSmarphoneFragement fphone;
-    InfoLaptopFragment flatop;
+    PhoneInfoFragement fphone;
+    LaptopInfoFragment flatop;
     ImageButton btnGioHang;
 
 
@@ -85,7 +85,7 @@ public class ProductDetail extends AppCompatActivity {
             buyProductNow();
         }
 
-        txtSl.setText(Handler.getTotalAmount(MainActivity.getCart()) + "");
+        txtSl.setText(Handler.getTotalAmount(MainActivity.getBasket()) + "");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -124,11 +124,11 @@ public class ProductDetail extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
-        cart = MainActivity.getCart();
+        cart = MainActivity.getBasket();
         txtSl.setText(Handler.getTotalAmount(cart) + "");
 
         //Tim kiem san pham da ton tai trong gio hang
-        item = (Product) getIntent().getExtras().get(SAN_PHAM);
+        item = (Product) getIntent().getExtras().get(ITEM);
 
         //Lay thong tin san pham
         db = MainActivity.getDatabaseInstence();
@@ -138,7 +138,7 @@ public class ProductDetail extends AppCompatActivity {
         index = Handler.findById(item.getId(), cart);
         if(index > -1) {
             LoginActivity.showToast(getBaseContext(), "Đơn hàng đã tồn tại trong giỏ hàng!");
-        } else if (MainActivity.getUser().isLogin()) {
+        } else if (MainActivity.getCurrentUser().isLogin()) {
             Order order = new Order(item.getId(), item.getName(), item.getPrice(), item.getImage()
                     , Integer.valueOf(spSluong.getSelectedItem().toString()));
             //Start activity Order
@@ -183,7 +183,7 @@ public class ProductDetail extends AppCompatActivity {
         }
 
         if (contain)
-            new AlertDialog.Builder(ProductDetail.this).setTitle(R.string.app_name)
+            new AlertDialog.Builder(ProductDetailActivity.this).setTitle(R.string.app_name)
                     .setMessage("Sản phầm này đã tồn tại trong giỏ hàng của bạn!").setNegativeButton("Thêm", (ex, id) -> addItemOnCart(order))
                     .setPositiveButton("Bỏ qua", null).show();
 
@@ -211,8 +211,8 @@ public class ProductDetail extends AppCompatActivity {
 
                     if (item.getCategoryid() == Product.LSP_PHONE) {
                         JsonObject json = Handler.convertToJSon(response.body().string());
-                        SmartphoneInfo info = gson.fromJson(json.get("technical"), SmartphoneInfo.class);
-                        fphone = new InfoSmarphoneFragement(info);
+                        PhoneInfo info = gson.fromJson(json.get("technical"), PhoneInfo.class);
+                        fphone = new PhoneInfoFragement(info);
 
                         fmanager.beginTransaction()
                                 .replace(R.id.frag_info_product, fphone).commit();
@@ -221,19 +221,19 @@ public class ProductDetail extends AppCompatActivity {
                     if (item.getCategoryid() == Product.LSP_LAPTOP) {
                         JsonObject json = Handler.convertToJSon(response.body().string());
                         LaptopInfo info = gson.fromJson(json.get("technical"), LaptopInfo.class);
-                        flatop = new InfoLaptopFragment(info);
+                        flatop = new LaptopInfoFragment(info);
                         fmanager.beginTransaction().replace(R.id.frag_info_product, flatop)
                                 .commit();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(ProductDetail.this.getBaseContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProductDetailActivity.this.getBaseContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(ProductDetail.this.getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT)
+                Toast.makeText(ProductDetailActivity.this.getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT)
                         .show();
             }
         });
@@ -248,12 +248,14 @@ public class ProductDetail extends AppCompatActivity {
          */
         boolean contain = index != -1;
 
-        if (!MainActivity.getUser().isLogin()) {
+        if (!MainActivity.getCurrentUser().isLogin()) {
             boolean success = true;
 
             if (contain) {
                 Order newOrder = new Order(order.getId(), order.getName(), order.getPrice()
                         , order.getImage(), order.getAmount() + amount);
+                newOrder.setSlmax(order.getSlmax());
+
                 success = db.updateCart(order.getId(), newOrder);
 
             } else
@@ -268,8 +270,8 @@ public class ProductDetail extends AppCompatActivity {
         } else {
             BasketService service = NetworkCommon.getRetrofit().create(BasketService.class);
 
-            User user = MainActivity.getUser();
-            Call<ResponseBody> call = service.addOrder(user.getId(), order.getId(), order.getAmount());
+            User user = MainActivity.getCurrentUser();
+            Call<ResponseBody> call = service.addOrder(user.getAccesstoken(), order.getId(), order.getAmount());
 
             Database.print("259: product " + call.request());
 
@@ -289,10 +291,10 @@ public class ProductDetail extends AppCompatActivity {
                              *    Neu gio hang chua chua san pham thi se them san pham vao gio hang
                              */
                             if (contain)
-                                Handler.addItem(MainActivity.getCart(), order);
+                                Handler.addItem(MainActivity.getBasket(), order);
                             else
-                                MainActivity.getCart().add(order);
-                            txtSl.setText(Handler.totalSize(MainActivity.getCart()) + "");
+                                MainActivity.getBasket().add(order);
+                            txtSl.setText(Handler.totalSize(MainActivity.getBasket()) + "");
                             Toast.makeText(getBaseContext(), json.get("message").getAsString(), Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(getBaseContext(), json.get("error").getAsString(), Toast.LENGTH_SHORT).show();
@@ -304,7 +306,7 @@ public class ProductDetail extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Toast.makeText(ProductDetail.this.getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProductDetailActivity.this.getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -313,7 +315,7 @@ public class ProductDetail extends AppCompatActivity {
     }
 
     private void onActionOpenCart() {
-        Intent intent = new Intent(this, CartActivity.class);
+        Intent intent = new Intent(this, BasketActivity.class);
         intent.setAction(PRODUCT_OPEN_ORDER);
         startActivityForResult(intent, REQUEST_SIZE_AMOUNT);
     }
@@ -337,7 +339,7 @@ public class ProductDetail extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menucartorder:
-                Intent intent = new Intent(getApplicationContext(), CartActivity.class);
+                Intent intent = new Intent(getApplicationContext(), BasketActivity.class);
                 startActivityForResult(intent, REQUEST_SIZE_AMOUNT);
                 break;
         }

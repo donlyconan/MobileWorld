@@ -11,13 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.team.mobileworld.R;
-import com.team.mobileworld.core.object.SmartphoneInfo;
+import com.team.mobileworld.core.object.PhoneInfo;
 
-public class InfoSmarphoneFragement extends Fragment {
+public class PhoneInfoFragement extends Fragment {
 
-    private SmartphoneInfo info;
+    private PhoneInfo info;
 
-    public InfoSmarphoneFragement(SmartphoneInfo info) {
+    public PhoneInfoFragement(PhoneInfo info) {
         this.info = info;
     }
 
