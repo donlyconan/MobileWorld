@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.team.mobileworld.R;
@@ -18,7 +17,6 @@ import com.team.mobileworld.core.task.ViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.logging.Level;
 
 public class NotifyAdapter extends RecyclerView.Adapter<NotifyAdapter.ItemHolder> {
     private Activity activity;

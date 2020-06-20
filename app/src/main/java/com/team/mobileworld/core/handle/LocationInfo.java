@@ -3,6 +3,7 @@ package com.team.mobileworld.core.handle;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.util.Log;
 
@@ -14,7 +15,7 @@ import com.team.mobileworld.activity.MainActivity;
 import com.team.mobileworld.core.task.Worker;
 
 public class LocationInfo {
-    public static LatLng latLng =  new LatLng(21.04, 105.84);
+    public static LatLng latLng = new LatLng(21.00, 105.80);
     public static Activity activity;
     public static Worker worker;
 
@@ -27,18 +28,22 @@ public class LocationInfo {
                         , Manifest.permission.ACCESS_FINE_LOCATION
                 }, MainActivity.REQUEST_LOCATION);
             } else
-                if (worker != null) worker.hanlde();
+                getCurrentLocation();
         }
     }
 
     public static void getCurrentLocation() {
         LocationServices.getFusedLocationProviderClient(activity)
-                .getLastLocation().addOnSuccessListener(location -> {
-            if (location != null) {
-                latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                Log.d("location", latLng.toString());
+                .getLastLocation().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Location location = task.getResult();
+                if (location != null) {
+                    latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    Log.d("location", latLng.toString());
+                }
             }
-            if(worker != null) worker.hanlde();
+            if (worker != null) worker.hanlde();
+
         });
     }
 

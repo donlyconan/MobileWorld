@@ -147,6 +147,7 @@ public class NotificationActivity extends AppCompatActivity {
                                 , Calendar.getInstance().getTime()
                                 , 1
                         );
+                        Log.d("userinfo", message.toString());
                         list.add(0, message);
                         adapter.notifyDataSetChanged();
                     } catch (IOException e) {

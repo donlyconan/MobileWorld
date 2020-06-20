@@ -363,6 +363,7 @@ public class LoginActivity extends AppCompatActivity {
                     Database.print("id user=" + user);
                     user.setLink(User.LOGIN_ACCOUNT);
                     MainActivity.setCurrentUser(user);
+                    MainActivity.NewLogin = true;
                     onLoginSuccess();
                     onActionChange(remember.isChecked());
                 } else {

@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     android:background="@color/colorToolbar">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imageView5"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_gravity="center"
         android:layout_span="3"
         android:src="@drawable/logo"

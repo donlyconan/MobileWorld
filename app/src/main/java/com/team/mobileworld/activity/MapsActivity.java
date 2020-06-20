@@ -46,7 +46,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-    public static final int SIZE_CURRENT_LOCATION = 16;
+    public static final int SIZE_CURRENT_LOCATION = 15;
     private static final String DEBUG = "projectinfo";
     FusedLocationProviderClient locationProviderClient;
     public static String Address = "";
@@ -107,7 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         btnselect.setOnClickListener(e -> {
             String address = txtaddress.getText().toString();
-            print("address="+address);
+            print("address=" + address);
             final Intent intent = new Intent();
             intent.putExtra("address", address);
             Address = address;
@@ -290,30 +290,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlemap = googleMap;
         showCurrentLocation();
         googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        if (Intent.CATEGORY_OPENABLE == getIntent().getAction()) {
-            double lat = getIntent().getExtras().getFloat("lat");
-            double lng = getIntent().getExtras().getFloat("lng");
+
+        googlemap.setOnMapClickListener(lng -> {
+
             Geocoder geocoder = new Geocoder(this);
             try {
-                googlemap.clear();
-                List<Address> addressList = geocoder.getFromLocation(lat, lng, 1);
+                Log.d("mapinfo", "Map Click: " + lng.toString());
+                List<Address> addressList = geocoder.getFromLocation(lng.latitude, lng.longitude, 1);
                 findAddress(addressList);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            googlemap.setOnMapClickListener(lng -> {
-
-                Geocoder geocoder = new Geocoder(this);
-                try {
-                    List<Address> addressList = geocoder.getFromLocation(lng.latitude, lng.longitude, 1);
-                    findAddress(addressList);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-        }
+        });
 
     }
 

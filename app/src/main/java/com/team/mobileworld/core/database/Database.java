@@ -82,8 +82,7 @@ public class Database extends SQLiteOpenHelper {
         String sql = "select username,password,time from " + TABLE_ACCOUNT + " ORDER BY time DESC";
         Cursor cur = db.rawQuery(sql, null);
 
-        if (cur != null && cur.getCount() > 0) {
-            cur.moveToNext();
+        if (cur != null && cur.moveToFirst()) {
             account = new Account(cur.getString(0), cur.getString(1));
         }
 

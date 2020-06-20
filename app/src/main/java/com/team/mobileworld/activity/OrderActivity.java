@@ -1,6 +1,7 @@
 package com.team.mobileworld.activity;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -56,6 +57,7 @@ public class OrderActivity extends AppCompatActivity {
     private static final int REQUEST_PERSON = 10;
     private static final int REQUEST_ADDRESS = 11;
     private static final int ID_NOTIFICATION = 100;
+    private static final String MY_CHANNEL = "my_channel_113";
 
     OrderApdater apdater;
     RecyclerView recycler;
@@ -147,13 +149,22 @@ public class OrderActivity extends AppCompatActivity {
 
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0, intent, 0);
             final Notification noti = Handler.createNotificationChannel(this,pendingIntent
-            , "Đặt hàng thành công!", "Bạn đã một đơn hàng, lúc "
+                    , "Đặt hàng thành công!", "Bạn đã một đơn hàng, lúc "
                             + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()) +
-                            " hãy vào đơn mua để theo cập nhật thông tin sản phẩm sớm nhất.")
+                            " hãy vào đơn mua để theo cập nhật thông tin sản phẩm sớm nhất.",
+                    MY_CHANNEL)
                     .setContentIntent(pendingIntent)
                     .build();
+
             noti.flags |= Notification.FLAG_AUTO_CANCEL;
             final NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+            //Thiet lap 1 channel
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(MY_CHANNEL, "Notification", NotificationManager.IMPORTANCE_HIGH);
+                manager.createNotificationChannel(channel);
+            }
+
 
             //Tao 1 cong viec dat san pham
             Worker worker = () -> {
@@ -175,7 +186,7 @@ public class OrderActivity extends AppCompatActivity {
                                     Toast.makeText(OrderActivity.this, json.get(MainActivity.MESSAGE).getAsString(), Toast.LENGTH_SHORT).show();
 
                                     //Tra ve ok neu dat hang thanh cong
-                                    manager.notify(0, noti);
+                                    manager.notify(0 , noti);
                                     setResult(RESULT_OK);
                                     dialog.dismiss();
                                     finish();

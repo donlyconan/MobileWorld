@@ -52,15 +52,18 @@ public class Handler {
             Activity activity
             , PendingIntent intent
             , String title
-            , String content) {
+            , String content, String mychannel) {
 
-        Notification.Builder builder = new Notification.Builder(activity)
-                .setSmallIcon(R.drawable.logo)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setDefaults(Notification.DEFAULT_SOUND)
-                .setAutoCancel(true)
-                .addAction(R.drawable.ic_notifications, "Open", intent);
+        Notification.Builder builder = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder = new Notification.Builder(activity, mychannel)
+                    .setSmallIcon(R.drawable.logo)
+                    .setContentTitle(title)
+                    .setContentText(content)
+                    .setDefaults(Notification.DEFAULT_SOUND)
+                    .setAutoCancel(true)
+                    .addAction(R.drawable.ic_notifications, "Open", intent);
+        }
         return builder;
     }
 

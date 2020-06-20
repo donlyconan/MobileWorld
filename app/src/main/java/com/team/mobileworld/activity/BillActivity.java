@@ -55,7 +55,7 @@ public class BillActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                getCurrentDatas();
+                getCurrentData();
             }
 
             @Override
@@ -65,16 +65,16 @@ public class BillActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                getCurrentDatas();
+                getCurrentData();
             }
         });
 
         //Lay du lieu tren server
-        getCurrentDatas();
+        getCurrentData();
 
     }
 
-    public void getCurrentDatas() {
+    public void getCurrentData() {
         int index = tabLayout.getSelectedTabPosition();
 
         switch (index) {
